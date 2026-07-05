@@ -117,7 +117,6 @@
             @page { margin: 0.5cm; }
         }
     </style>
-
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10843713009"></script>
 <script>
@@ -211,9 +210,19 @@
 
             <div class="ntn-wrap" style="font-size: 14px; font-weight: normal; margin-top: 5px;">NTN: <div class="editable-text-container"><span contenteditable="true">1234567-8</span></div></div>
             
-            <div class="customer-info-wrap" style="margin-top: 15px; font-size: 14px; text-align: left; border-top: 1px dashed #eee; padding-top: 10px; display: flex; flex-direction: column; gap: 5px;">
-                <div style="display: flex; align-items: center; gap: 4px;">Customer: <div class="editable-text-container" style="font-weight: bold;"><span id="cust-name-field" contenteditable="true" style="min-width: 130px; display: inline-block; border-bottom: 1px dotted #ccc;">Counter Sale</span></div></div>
-                <div style="display: flex; align-items: center; gap: 4px;">Address: <div class="editable-text-container"><div id="cust-address-field" contenteditable="true" style="display:inline-block; font-weight: normal;">#</div></div></div>
+            <div class="customer-info-wrap" style="margin-top: 15px; font-size: 14px; text-align: left; border-top: 1px dashed #eee; padding-top: 10px; display: flex; flex-direction: column; gap: 5px; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+                    <span>Customer:</span> 
+                    <div class="editable-text-container" style="font-weight: bold; flex: 1; display: inline-flex;">
+                        <span id="cust-name-field" contenteditable="true" style="display: inline-block; border-bottom: 1px dotted #ccc; text-align: left; width: 100%;">Counter Sale</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+                    <span>Address:</span> 
+                    <div class="editable-text-container" style="flex: 1; display: inline-flex;">
+                        <div id="cust-address-field" contenteditable="true" style="display: inline-block; font-weight: normal; border-bottom: 1px dotted #ccc; text-align: left; width: 100%;">#</div>
+                    </div>
+                </div>
             </div>
         </div>
         <div style="text-align: right; display: flex; flex-direction: column; justify-content: dashed;">
