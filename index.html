@@ -47,7 +47,7 @@
         input:focus { background: #fffde7; }
 
         /* --- Pencil Icons Styling --- */
-        .editable-text-container { position: relative; display: inline-block; padding-right: 18px; }
+        .editable-text-container { position: relative; display: inline-flex; align-items: center; padding-right: 18px; }
         .editable-text-container::after { 
             content: "✏️"; position: absolute; right: 0; top: 50%; transform: translateY(-50%); 
             font-size: 11px; opacity: 0.6; pointer-events: none; 
@@ -117,7 +117,8 @@
             @page { margin: 0.5cm; }
         }
     </style>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10843713009"></script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-10843713009"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -209,9 +210,9 @@
 
             <div class="ntn-wrap" style="font-size: 14px; font-weight: normal; margin-top: 5px;">NTN: <div class="editable-text-container"><span contenteditable="true">1234567-8</span></div></div>
             
-            <div class="customer-info-wrap" style="margin-top: 15px; font-size: 14px; text-align: left; border-top: 1px dashed #eee; padding-top: 10px;">
-                <div style="margin-bottom: 5px; position: relative;">Customer: <div class="editable-text-container" style="font-weight: bold;"><span id="cust-name-field" contenteditable="true" style="min-width: 130px; display: inline-block; border-bottom: 1px dotted #ccc;">Counter Sale</span></div></div>
-                <div style="font-size: 14px; margin-top: 5px;">Address: <div class="editable-text-container"><div id="cust-address-field" contenteditable="true" style="display:inline-block; font-weight: normal;">#</div></div></div>
+            <div class="customer-info-wrap" style="margin-top: 15px; font-size: 14px; text-align: left; border-top: 1px dashed #eee; padding-top: 10px; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; align-items: center; gap: 4px;">Customer: <div class="editable-text-container" style="font-weight: bold;"><span id="cust-name-field" contenteditable="true" style="min-width: 130px; display: inline-block; border-bottom: 1px dotted #ccc;">Counter Sale</span></div></div>
+                <div style="display: flex; align-items: center; gap: 4px;">Address: <div class="editable-text-container"><div id="cust-address-field" contenteditable="true" style="display:inline-block; font-weight: normal;">#</div></div></div>
             </div>
         </div>
         <div style="text-align: right; display: flex; flex-direction: column; justify-content: dashed;">
