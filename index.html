@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate Universal Bill Generator</title>
+    
+    <!-- PWA Meta Tags & Manifest Link -->
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -316,6 +322,16 @@
 </div>
 
 <script>
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker registered!'))
+            .catch(err => console.log('Service Worker registration failed: ', err));
+        });
+    }
+
+    
     // --- Initializations ---
     let savedItems = JSON.parse(localStorage.getItem("inventory")) || [];
     let savedCustomers = JSON.parse(localStorage.getItem("customer_profiles")) || [{"name": "Counter Sale", "address": "#"}];
