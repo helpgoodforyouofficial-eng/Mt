@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate Universal Bill Generator</title>
     
-    <!-- PWA Meta Tags & Manifest Link -->
     <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -91,6 +90,13 @@
         .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; }
         
+        /* --- Record Section Styling --- */
+        .record-panel { max-width: 800px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid var(--share); }
+        .record-table { font-size: 13px; margin-top: 10px; }
+        .record-table th { background: #2c3e50; color: white; border: 1px solid #ddd; }
+        .record-table td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        .prod-tag { display: inline-block; background: #eef2f3; color: #333; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin: 2px; border: 1px solid #ccc; }
+
         /* Forces desktop style inside snapshot/PC rendering without stack structure */
         .force-pc-layout {
             width: 800px !important;
@@ -111,7 +117,7 @@
 
         /* --- Print Control Layout --- */
         @media print {
-            .no-print, .admin-panel, .btn-add, .action-buttons, .modal, .rt-col-action { display: none !important; }
+            .no-print, .admin-panel, .btn-add, .action-buttons, .modal, .rt-col-action, .record-panel { display: none !important; }
             body { background: #fff; padding: 0; margin: 0; }
             .bill-wrapper { border: none !important; box-shadow: none !important; padding: 0px; margin: 0 auto; overflow: visible !important; }
             .bill-wrapper .header { flex-direction: row !important; text-align: left !important; gap: 0 !important; }
@@ -123,8 +129,7 @@
             @page { margin: 0.5cm; }
         }
     </style>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-10843713009"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10843713009"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -289,6 +294,29 @@
     <button class="btn" style="background: #2c3e50; grid-column: span 2;" onclick="showDevModal()">Developer Information</button>
 </div>
 
+<div class="record-panel no-print">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+        <h3 style="margin:0; color: var(--primary);">📋 Saved Bills History / Ledger</h3>
+        <button onclick="clearAllBillsHistory()" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">Clear All History</button>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="record-table">
+            <thead>
+                <tr>
+                    <th width="12%">Bill No</th>
+                    <th width="20%">Customer</th>
+                    <th width="15%">Date</th>
+                    <th width="35%">Products Details (Qty x Rate)</th>
+                    <th width="18%">Total Amount</th>
+                </tr>
+            </thead>
+            <tbody id="bill-history-rows">
+                <tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No bill records found yet. Save/Print a bill to log details.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div id="printModal" class="modal no-print">
     <div class="modal-content">
         <h4>Select Paper Size</h4>
@@ -333,6 +361,7 @@
     // --- Initializations ---
     let savedItems = JSON.parse(localStorage.getItem("inventory")) || [];
     let savedCustomers = JSON.parse(localStorage.getItem("customer_profiles")) || [{"name": "Counter Sale", "address": "#"}];
+    let savedBillsLog = JSON.parse(localStorage.getItem("bills_history_log")) || [];
     
     function syncPaperSize(val) {
         document.getElementById('pageSize').value = val;
@@ -471,6 +500,66 @@
         }
     }
 
+    // --- Bill Logging Logic ---
+    function logBillToHistory() {
+        const billNo = document.getElementById("bill-no").innerText.trim();
+        const customer = document.getElementById("cust-name-field").innerText.trim();
+        const dateVal = document.getElementById("date-field").value;
+        const totalAmount = document.getElementById("total-val").innerText;
+        const currencySymbol = document.querySelector('.cur').innerText;
+
+        let products = [];
+        document.querySelectorAll("#items tr").forEach(row => {
+            const name = row.querySelector(".item-input").value.trim();
+            const qty = row.querySelector(".q").value;
+            const rate = row.querySelector(".r").value;
+            if(name) {
+                products.push(`${name} (${qty}x${rate})`);
+            }
+        });
+
+        // Duplicate entry check blocking
+        if(savedBillsLog.some(b => b.billNo === billNo && b.customer === customer && b.totalAmount === totalAmount)) {
+            return; 
+        }
+
+        const newLog = { billNo, customer, dateVal, products, totalAmount: currencySymbol + " " + totalAmount };
+        savedBillsLog.unshift(newLog); // Naya bill top pe dikhega
+        localStorage.setItem("bills_history_log", JSON.stringify(savedBillsLog));
+        renderBillsHistory();
+    }
+
+    function renderBillsHistory() {
+        const tbody = document.getElementById("bill-history-rows");
+        if (savedBillsLog.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999; padding:20px;">No bill records found yet. Save/Print a bill to log details.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        savedBillsLog.forEach(b => {
+            const tr = document.createElement("tr");
+            let prodHTML = b.products.map(p => `<span class="prod-tag">${p}</span>`).join(" ");
+            
+            tr.innerHTML = `
+                <td style="font-weight:bold; color:#2c3e50;">${b.billNo}</td>
+                <td style="font-weight:600;">${b.customer}</td>
+                <td>${b.dateVal}</td>
+                <td>${prodHTML || '<i style="color:#aaa;">No Products</i>'}</td>
+                <td style="font-weight:bold; color:#27ae60; text-align:right;">${b.totalAmount}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function clearAllBillsHistory() {
+        if(confirm("Are you sure you want to permanently clear all bills records history?")) {
+            savedBillsLog = [];
+            localStorage.removeItem("bills_history_log");
+            renderBillsHistory();
+        }
+    }
+
     function showPrintModal() {
         document.getElementById("printModal").style.display = "block";
         document.getElementById("pageSize").onchange = function() {
@@ -511,6 +600,7 @@
 
     function applyPrint() {
         captureCustomerName();
+        logBillToHistory(); // Record save
         autoIncrementBillNo();
         gtag("event", "bill_generated", { "event_category": "Engagement", "event_label": "Invoice Printed" });
 
@@ -533,6 +623,7 @@
 
     async function shareBill() {
         captureCustomerName();
+        logBillToHistory(); // Record save
         autoIncrementBillNo();
         gtag("event", "bill_shared", { "event_category": "Engagement", "event_label": "Invoice Shared" });
 
@@ -575,6 +666,7 @@
 
     async function downloadFile(formatType) {
         captureCustomerName();
+        logBillToHistory(); // Record save
         autoIncrementBillNo();
         gtag("event", "bill_downloaded", { "event_category": "Engagement", "event_label": "Invoice Downloaded" });
 
@@ -630,6 +722,9 @@
     addRow();
 
     document.addEventListener("DOMContentLoaded", function() {
+        // Render existing history on load
+        renderBillsHistory();
+
         // Load persistent bill no if available
         const lastBill = localStorage.getItem("last_bill_no");
         if (lastBill) {
