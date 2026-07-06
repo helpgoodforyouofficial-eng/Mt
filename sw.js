@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bill-gen-v4';
+const CACHE_NAME = 'bill-gen-v5';
 const ASSETS = [
   'index.html',
   'manifest.json',
