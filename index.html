@@ -108,13 +108,18 @@
         .force-pc-layout .header div { text-align: left !important; }
         .force-pc-layout .header div:last-child { text-align: right !important; }
 
-        @media (max-width: 600px) {
-            .header { flex-direction: column; text-align: center; gap: 15px; }
-            .header div { text-align: center !important; }
+       @media (max-width: 600px) {
+            .header { flex-direction: column; text-align: left; gap: 15px; }
+            .header div { text-align: left !important; }
+            /* Mobile par INVOICE, Date aur Bill No ko right side par barkarar rakhne ke liye */
+            .header > div:last-child, .header > div:last-child * { text-align: right !important; justify-content: flex-end !important; align-items: flex-end !important; }
+            /* Customer aur Address fields ko mobile view mein zabardasti left alignment dene ke liye */
+            .customer-info-wrap, .customer-info-wrap * { text-align: left !important; justify-content: flex-start !important; }
             .action-buttons { grid-template-columns: 1fr; }
             .bill-wrapper { padding: 15px; }
             input { font-size: 13px; } 
         }
+
 
         /* --- Print Control Layout --- */
         @media print {
