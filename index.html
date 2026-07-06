@@ -334,6 +334,8 @@
     </div>
 </div>
 
+
+
 <div id="printModal" class="modal no-print">
     <div class="modal-content">
         <h4>Select Paper Size</h4>
@@ -447,115 +449,6 @@ function updateTitleSize(sizeValue){
     if(mainTitleEl) {
         mainTitleEl.className = "biz-name " + sizeValue;
     }
-}
-
-function downloadHistoryPDF() {
-    // 1. LocalStorage se bills history ka data check karein
-    let historyData = JSON.parse(localStorage.getItem("bills_history_log")) || [];
-    
-    if (historyData.length === 0) {
-        alert("Download karne ke liye koi history record maujood nahi hai!");
-        return;
-    }
-
-    // 2. jsPDF instance create karein
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'pt', 'a4');
-
-    // 3. Document Header Styling
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(44, 62, 80); // Dark Blue Color
-    doc.text("Murshid Traders", 40, 50);
-    
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(127, 140, 141);
-    doc.text("Sadiq Abad, Pakistan | Mobile: 0300-8002765", 40, 68);
-    
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.setTextColor(39, 174, 96); // Green Color
-    doc.text("SALES HISTORY / LEDGER REPORT", 40, 95);
-    
-    // Ek line draw karein header ke niche
-    doc.setStrokeColor(230, 230, 230);
-    doc.setLineWidth(1);
-    doc.line(40, 105, 555, 105);
-
-    // 4. Data Prepare karein Table ke liye
-    const tableRows = [];
-    let grandTotalSum = 0;
-    let receivedSum = 0;
-    let balanceSum = 0;
-
-    historyData.forEach(bill => {
-        // Products details ko text format mein clean karein
-        let productText = "";
-        if (Array.isArray(bill.items)) {
-            productText = bill.items.map(item => `${item.name} (${item.qty}x${item.rate})`).join("\n");
-        } else if (typeof bill.products === 'string') {
-            productText = bill.products;
-        } else {
-            productText = "-";
-        }
-
-        // Totals calculate karne ke liye numbers format nikalna
-        let gTotal = parseFloat(bill.grandTotal) || 0;
-        let rcvd = parseFloat(bill.received) || 0;
-        let bal = parseFloat(bill.balance) || 0;
-
-        grandTotalSum += gTotal;
-        receivedSum += rcvd;
-        balanceSum += bal;
-
-        tableRows.push([
-            bill.billNo || '-',
-            bill.customerName || bill.customer || '-',
-            bill.date || '-',
-            productText,
-            gTotal.toFixed(2),
-            rcvd.toFixed(2),
-            bal.toFixed(2)
-        ]);
-    });
-
-    // Aakhiri row mein Total ka hisab dikhane ke liye
-    tableRows.push([
-        { content: 'Total Summary', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 240, 240] } },
-        { content: grandTotalSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
-        { content: receivedSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
-        { content: balanceSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }
-    ]);
-
-    // 5. autoTable dynamic render karein (Kyunke cdn jspdf ke sath autoTable default integrated hoti hai)
-    if (typeof doc.autoTable === 'function') {
-        doc.autoTable({
-            startY: 120,
-            head: [['Bill No', 'Customer', 'Date', 'Products Details (Qty x Rate)', 'Grand Total', 'Received', 'Balance']],
-            body: tableRows,
-            theme: 'striped',
-            headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
-            styles: { fontSize: 9, cellPadding: 6, overflow: 'linebreak', font: 'helvetica' },
-            columnStyles: {
-                0: { cellWidth: 45 },
-                1: { cellWidth: 90 },
-                2: { cellWidth: 65 },
-                3: { cellWidth: 160 },
-                4: { cellWidth: 55, halign: 'right' },
-                5: { cellWidth: 55, halign: 'right' },
-                6: { cellWidth: 55, halign: 'right' }
-            },
-            margin: { left: 40, right: 40 }
-        });
-    } else {
-        // Fallback agar autoTable library bind na ho kisi wajah se
-        alert("PDF Table library generate nahi ho saki, normal layout fallback ho raha hai.");
-    }
-
-    // 6. PDF Save karein automatic file name ke sath
-    let currentToday = new Date().toISOString().slice(0,10);
-    doc.save(`Ledger_History_${currentToday}.pdf`);
 }
 
     
@@ -683,81 +576,185 @@ function downloadHistoryPDF() {
         }
     }
 
-    // --- Updated Bill Logging Logic with Paid/Balance ---
-    function logBillToHistory() {
-        const billNo = document.getElementById("bill-no").innerText.trim();
-        const customer = document.getElementById("cust-name-field").innerText.trim();
-        const dateVal = document.getElementById("date-field").value;
-        const totalAmount = document.getElementById("total-val").innerText;
-        const paidAmount = parseFloat(document.getElementById("paid").value) || 0;
-        const balanceAmount = document.getElementById("bal-val").innerText;
-        const currencySymbol = document.querySelector('.cur').innerText;
+   // --- Updated Bill Logging Logic with Paid/Balance ---
+function logBillToHistory() {
+    const billNo = document.getElementById("bill-no").innerText.trim();
+    const customer = document.getElementById("cust-name-field").innerText.trim();
+    const dateVal = document.getElementById("date-field").value;
+    const totalAmount = document.getElementById("total-val").innerText;
+    const paidAmount = parseFloat(document.getElementById("paid").value) || 0;
+    const balanceAmount = document.getElementById("bal-val").innerText;
+    const currencySymbol = document.querySelector('.cur').innerText;
 
-        let products = [];
-        document.querySelectorAll("#items tr").forEach(row => {
-            const name = row.querySelector(".item-input").value.trim();
-            const qty = row.querySelector(".q").value;
-            const rate = row.querySelector(".r").value;
-            if(name) {
-                products.push(`${name} (${qty}x${rate})`);
-            }
-        });
-
-        // Duplicate entry check blocking
-        if(savedBillsLog.some(b => b.billNo === billNo && b.customer === customer && b.totalAmount === (currencySymbol + " " + totalAmount))) {
-            return; 
+    let products = [];
+    document.querySelectorAll("#items tr").forEach(row => {
+        const name = row.querySelector(".item-input").value.trim();
+        const qty = row.querySelector(".q").value;
+        const rate = row.querySelector(".r").value;
+        if(name) {
+            products.push(`${name} (${qty}x${rate})`);
         }
+    });
 
-        const newLog = { 
-            billNo, 
-            customer, 
-            dateVal, 
-            products, 
-            totalAmount: currencySymbol + " " + totalAmount,
-            paidAmount: currencySymbol + " " + paidAmount.toFixed(2),
-            balanceAmount: currencySymbol + " " + balanceAmount
-        };
-        savedBillsLog.unshift(newLog); // Naya bill top pe dikhega
-        localStorage.setItem("bills_history_log", JSON.stringify(savedBillsLog));
+    // Duplicate entry check blocking
+    if(savedBillsLog.some(b => b.billNo === billNo && b.customer === customer && b.totalAmount === (currencySymbol + " " + totalAmount))) {
+        return; 
+    }
+
+    const newLog = { 
+        billNo, 
+        customer, 
+        dateVal, 
+        products, 
+        totalAmount: currencySymbol + " " + totalAmount,
+        paidAmount: currencySymbol + " " + paidAmount.toFixed(2),
+        balanceAmount: currencySymbol + " " + balanceAmount
+    };
+    savedBillsLog.unshift(newLog); // Naya bill top pe dikhega
+    localStorage.setItem("bills_history_log", JSON.stringify(savedBillsLog));
+    renderBillsHistory();
+}
+
+function renderBillsHistory() {
+    const tbody = document.getElementById("bill-history-rows");
+    if (savedBillsLog.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#999; padding:20px;">No bill records found yet. Save/Print a bill to log details.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = "";
+    savedBillsLog.forEach(b => {
+        const tr = document.createElement("tr");
+        let prodHTML = b.products.map(p => `<span class="prod-tag">${p}</span>`).join(" ");
+        
+        // Checking if balance is positive to highlight in red
+        const isPending = parseFloat(b.balanceAmount.replace(/[^0-9.-]/g, '')) > 0;
+        const balStyle = isPending ? "font-weight:bold; color:red; text-align:right;" : "font-weight:bold; color:#777; text-align:right;";
+
+        tr.innerHTML = `
+            <td style="font-weight:bold; color:#2c3e50;">${b.billNo}</td>
+            <td style="font-weight:600;">${b.customer}</td>
+            <td>${b.dateVal}</td>
+            <td>${prodHTML || '<i style="color:#aaa;">No Products</i>'}</td>
+            <td style="font-weight:bold; color:#2c3e50; text-align:right;">${b.totalAmount}</td>
+            <td style="font-weight:bold; color:#27ae60; text-align:right;">${b.paidAmount || '0.00'}</td>
+            <td style="${balStyle}">${b.balanceAmount || '0.00'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function clearAllBillsHistory() {
+    if(confirm("Are you sure you want to permanently clear all bills records history?")) {
+        savedBillsLog = [];
+        localStorage.removeItem("bills_history_log");
         renderBillsHistory();
     }
+}
 
-    function renderBillsHistory() {
-        const tbody = document.getElementById("bill-history-rows");
-        if (savedBillsLog.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#999; padding:20px;">No bill records found yet. Save/Print a bill to log details.</td></tr>`;
-            return;
+// 🔥 --- FULLY FIXED PDF DOWNLOAD FUNCTION ---
+function downloadHistoryPDF() {
+    let historyData = JSON.parse(localStorage.getItem("bills_history_log")) || [];
+    
+    if (historyData.length === 0) {
+        alert("Download karne ke liye koi history record maujood nahi hai!");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'pt', 'a4');
+
+    // Header Styling
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(44, 62, 80);
+    doc.text("Murshid Traders", 40, 50);
+    
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(127, 140, 141);
+    doc.text("Sadiq Abad, Pakistan | Mobile: 0300-8002765", 40, 68);
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(39, 174, 96);
+    doc.text("SALES HISTORY / LEDGER REPORT", 40, 95);
+    
+    doc.setStrokeColor(230, 230, 230);
+    doc.setLineWidth(1);
+    doc.line(40, 105, 555, 105);
+
+    const tableRows = [];
+    let grandTotalSum = 0;
+    let receivedSum = 0;
+    let balanceSum = 0;
+
+    historyData.forEach(bill => {
+        // Products key ko array / string format ke hisab se parse kiya
+        let productText = "-";
+        if (Array.isArray(bill.products)) {
+            productText = bill.products.join("\n");
+        } else if (typeof bill.products === 'string') {
+            productText = bill.products;
         }
 
-        tbody.innerHTML = "";
-        savedBillsLog.forEach(b => {
-            const tr = document.createElement("tr");
-            let prodHTML = b.products.map(p => `<span class="prod-tag">${p}</span>`).join(" ");
-            
-            // Checking if balance is positive to highlight in red
-            const isPending = parseFloat(b.balanceAmount.replace(/[^0-9.-]/g, '')) > 0;
-            const balStyle = isPending ? "font-weight:bold; color:red; text-align:right;" : "font-weight:bold; color:#777; text-align:right;";
+        // Currency symbols (e.g., Rs.) ko hata kar unko proper number mein convert karna taake crash na ho
+        let cleanTotal = bill.totalAmount ? parseFloat(bill.totalAmount.replace(/[^0-9.-]/g, '')) : 0;
+        let cleanReceived = bill.paidAmount ? parseFloat(bill.paidAmount.replace(/[^0-9.-]/g, '')) : 0;
+        let cleanBalance = bill.balanceAmount ? parseFloat(bill.balanceAmount.replace(/[^0-9.-]/g, '')) : 0;
 
-            tr.innerHTML = `
-                <td style="font-weight:bold; color:#2c3e50;">${b.billNo}</td>
-                <td style="font-weight:600;">${b.customer}</td>
-                <td>${b.dateVal}</td>
-                <td>${prodHTML || '<i style="color:#aaa;">No Products</i>'}</td>
-                <td style="font-weight:bold; color:#2c3e50; text-align:right;">${b.totalAmount}</td>
-                <td style="font-weight:bold; color:#27ae60; text-align:right;">${b.paidAmount || '0.00'}</td>
-                <td style="${balStyle}">${b.balanceAmount || '0.00'}</td>
-            `;
-            tbody.appendChild(tr);
+        grandTotalSum += cleanTotal;
+        receivedSum += cleanReceived;
+        balanceSum += cleanBalance;
+
+        tableRows.push([
+            bill.billNo || '-',
+            bill.customer || '-',
+            bill.dateVal || '-',
+            productText,
+            cleanTotal.toFixed(2),
+            cleanReceived.toFixed(2),
+            cleanBalance.toFixed(2)
+        ]);
+    });
+
+    // Final Total Row Footer
+    tableRows.push([
+        { content: 'Total Summary', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 240, 240] } },
+        { content: grandTotalSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
+        { content: receivedSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
+        { content: balanceSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }
+    ]);
+
+    if (typeof doc.autoTable === 'function') {
+        doc.autoTable({
+            startY: 120,
+            head: [['Bill No', 'Customer', 'Date', 'Products Details (Qty x Rate)', 'Grand Total', 'Received', 'Balance']],
+            body: tableRows,
+            theme: 'striped',
+            headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+            styles: { fontSize: 9, cellPadding: 6, overflow: 'linebreak', font: 'helvetica' },
+            columnStyles: {
+                0: { cellWidth: 45 },
+                1: { cellWidth: 90 },
+                2: { cellWidth: 65 },
+                3: { cellWidth: 160 },
+                4: { cellWidth: 55, halign: 'right' },
+                5: { cellWidth: 55, halign: 'right' },
+                6: { cellWidth: 55, halign: 'right' }
+            },
+            margin: { left: 40, right: 40 }
         });
+    } else {
+        alert("PDF AutoTable extension bind nahi ho saki!");
     }
 
-    function clearAllBillsHistory() {
-        if(confirm("Are you sure you want to permanently clear all bills records history?")) {
-            savedBillsLog = [];
-            localStorage.removeItem("bills_history_log");
-            renderBillsHistory();
-        }
-    }
+    let currentToday = new Date().toISOString().slice(0,10);
+    doc.save(`Ledger_History_${currentToday}.pdf`);
+}
+
+   
+   
 
     function showPrintModal() {
         document.getElementById("printModal").style.display = "block";
