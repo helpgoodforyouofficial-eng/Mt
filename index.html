@@ -363,7 +363,7 @@
 </div>
 
 <script>
-    // --- PWA Service Worker Registration & Prompt Logic (Fully Fixed) ---
+// --- PWA Service Worker Registration & Prompt Logic ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
@@ -379,61 +379,74 @@ window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     
-    // Element ko event ke andar dhoondha taake 'null' ka khatra khatam ho jaye
-    const installBtn = document.getElementById('pwa-install-btn');
-    if (installBtn) {
-        installBtn.style.setProperty('display', 'block', 'important'); 
+    const installBanner = document.getElementById('pwa-install-btn');
+    if (installBanner) {
+        installBanner.style.setProperty('display', 'flex', 'important'); 
     }
 });
 
 // 2. Click handle karne ke liye jab page poora tayyar ho jaye
 document.addEventListener("DOMContentLoaded", function() {
-    const installBtn = document.getElementById('pwa-install-btn');
+    // Click event hum banner ke andar maujood actual button par lagayein ge
+    const actualBtn = document.getElementById('pwa-actual-install-click');
+    const installBanner = document.getElementById('pwa-install-btn');
     
-    if (installBtn) {
-        installBtn.addEventListener('click', async () => {
+    if (actualBtn) {
+        actualBtn.addEventListener('click', async () => {
             if (!deferredPrompt) return;
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             console.log(`User response to the install prompt: ${outcome}`);
             deferredPrompt = null;
-            installBtn.style.setProperty('display', 'none', 'important');
+            if (installBanner) installBanner.style.setProperty('display', 'none', 'important');
         });
     }
 
-    // 🔥 TESTING / FORCE SHOW RULE:
-    // Agar aapne app pehle se install ki hui hai aur aap sirf banner ka top view check karna chahte hain,
-    // to niche wali line ke shuru se '//' hata kar push karein, banner jabran top par dikh jayega:
-    // if(installBtn) installBtn.style.setProperty('display', 'block', 'important');
+    // TESTING / FORCE SHOW: Layout check karne ke liye niche wali line se '//' hatayein
+    // if(installBanner) installBanner.style.setProperty('display', 'flex', 'important');
 });
 
 // 3. Jab app successfully install ho jaye
 window.addEventListener('appinstalled', (evt) => {
     console.log('PWA was successfully installed!');
-    const installBtn = document.getElementById('pwa-install-btn');
-    if (installBtn) {
-        installBtn.style.setProperty('display', 'none', 'important');
+    const installBanner = document.getElementById('pwa-install-btn');
+    if (installBanner) {
+        installBanner.style.setProperty('display', 'none', 'important');
     }
 });
 
-    // --- Initializations ---
-    let savedItems = JSON.parse(localStorage.getItem("inventory")) || [];
-    let savedCustomers = JSON.parse(localStorage.getItem("customer_profiles")) || [{"name": "Counter Sale", "address": "#"}];
-    let savedBillsLog = JSON.parse(localStorage.getItem("bills_history_log")) || [];
-    
-    function syncPaperSize(val) {
-        document.getElementById('pageSize').value = val;
-        document.getElementById('topCustomDims').style.display = val === 'custom' ? 'inline-block' : 'none';
-        document.getElementById('customDims').style.display = val === 'custom' ? 'block' : 'none';
-    }
 
+// --- Initializations & Variables ---
+let savedItems = JSON.parse(localStorage.getItem("inventory")) || [];
+let savedCustomers = JSON.parse(localStorage.getItem("customer_profiles")) || [{"name": "Counter Sale", "address": "#"}];
+let savedBillsLog = JSON.parse(localStorage.getItem("bills_history_log")) || [];
+
+// --- Functions ---
+function syncPaperSize(val) {
+    const pageSizeEl = document.getElementById('pageSize');
+    const topCustomDimsEl = document.getElementById('topCustomDims');
+    const customDimsEl = document.getElementById('customDims');
+    
+    if(pageSizeEl) pageSizeEl.value = val;
+    if(topCustomDimsEl) topCustomDimsEl.style.display = val === 'custom' ? 'inline-block' : 'none';
+    if(customDimsEl) customDimsEl.style.display = val === 'custom' ? 'block' : 'none';
+}
+
+// QR Code Initialization
+if(document.getElementById("qrcode")) {
     (function(siteUrl){
         new QRCode(document.getElementById("qrcode"), { text: siteUrl, width: 60, height: 60 });
     })("https://freebills.netlify.app/");
+}
 
-    function updateTitleSize(sizeValue){
-        document.getElementById("main-title").className = "biz-name " + sizeValue;
+function updateTitleSize(sizeValue){
+    const mainTitleEl = document.getElementById("main-title");
+    if(mainTitleEl) {
+        mainTitleEl.className = "biz-name " + sizeValue;
     }
+}
+
+    
     
     function updateCurrencySymbol(symbol) {
         document.querySelectorAll('.cur').forEach(el => { el.innerText = symbol; });
