@@ -305,6 +305,34 @@
     <button class="btn btn-print" onclick="showPrintModal()">Print Options</button>
     <button class="btn" style="background: #2c3e50; grid-column: span 2;" onclick="showDevModal()">Developer Information</button>
 </div>
+<!-- --- Download History Button --- -->
+<div class="record-panel no-print">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+        <h3 style="margin:0; color: var(--primary);">📋 Saved Bills History / Ledger</h3>
+        <div style="display: flex; gap: 8px;">
+            <button onclick="downloadHistoryPDF()" style="background:#27ae60; color:white; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px; display:flex; align-items:center; gap:4px;">📥 Download History PDF</button>
+            <button onclick="clearAllBillsHistory()" style="background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">Clear All History</button>
+        </div>
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="record-table">
+            <thead>
+                <tr>
+                    <th width="10%">Bill No</th>
+                    <th width="18%">Customer</th>
+                    <th width="12%">Date</th>
+                    <th width="30%">Products Details (Qty x Rate)</th>
+                    <th width="10%">Grand Total</th>
+                    <th width="10%">Received</th>
+                    <th width="10%">Balance</th>
+                </tr>
+            </thead>
+            <tbody id="bill-history-rows">
+                <tr><td colspan="7" style="text-align:center; color:#999; padding:20px;">No bill records found yet. Save/Print a bill to log details.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <!-- --- Updated History Dashboard Panel --- -->
 <div class="record-panel no-print">
@@ -445,6 +473,115 @@ function updateTitleSize(sizeValue){
     if(mainTitleEl) {
         mainTitleEl.className = "biz-name " + sizeValue;
     }
+}
+
+function downloadHistoryPDF() {
+    // 1. LocalStorage se bills history ka data check karein
+    let historyData = JSON.parse(localStorage.getItem("bills_history_log")) || [];
+    
+    if (historyData.length === 0) {
+        alert("Download karne ke liye koi history record maujood nahi hai!");
+        return;
+    }
+
+    // 2. jsPDF instance create karein
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'pt', 'a4');
+
+    // 3. Document Header Styling
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(44, 62, 80); // Dark Blue Color
+    doc.text("Murshid Traders", 40, 50);
+    
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(127, 140, 141);
+    doc.text("Sadiq Abad, Pakistan | Mobile: 0300-8002765", 40, 68);
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(39, 174, 96); // Green Color
+    doc.text("SALES HISTORY / LEDGER REPORT", 40, 95);
+    
+    // Ek line draw karein header ke niche
+    doc.setStrokeColor(230, 230, 230);
+    doc.setLineWidth(1);
+    doc.line(40, 105, 555, 105);
+
+    // 4. Data Prepare karein Table ke liye
+    const tableRows = [];
+    let grandTotalSum = 0;
+    let receivedSum = 0;
+    let balanceSum = 0;
+
+    historyData.forEach(bill => {
+        // Products details ko text format mein clean karein
+        let productText = "";
+        if (Array.isArray(bill.items)) {
+            productText = bill.items.map(item => `${item.name} (${item.qty}x${item.rate})`).join("\n");
+        } else if (typeof bill.products === 'string') {
+            productText = bill.products;
+        } else {
+            productText = "-";
+        }
+
+        // Totals calculate karne ke liye numbers format nikalna
+        let gTotal = parseFloat(bill.grandTotal) || 0;
+        let rcvd = parseFloat(bill.received) || 0;
+        let bal = parseFloat(bill.balance) || 0;
+
+        grandTotalSum += gTotal;
+        receivedSum += rcvd;
+        balanceSum += bal;
+
+        tableRows.push([
+            bill.billNo || '-',
+            bill.customerName || bill.customer || '-',
+            bill.date || '-',
+            productText,
+            gTotal.toFixed(2),
+            rcvd.toFixed(2),
+            bal.toFixed(2)
+        ]);
+    });
+
+    // Aakhiri row mein Total ka hisab dikhane ke liye
+    tableRows.push([
+        { content: 'Total Summary', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 240, 240] } },
+        { content: grandTotalSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
+        { content: receivedSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
+        { content: balanceSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }
+    ]);
+
+    // 5. autoTable dynamic render karein (Kyunke cdn jspdf ke sath autoTable default integrated hoti hai)
+    if (typeof doc.autoTable === 'function') {
+        doc.autoTable({
+            startY: 120,
+            head: [['Bill No', 'Customer', 'Date', 'Products Details (Qty x Rate)', 'Grand Total', 'Received', 'Balance']],
+            body: tableRows,
+            theme: 'striped',
+            headStyles: { fillColor: [44, 62, 80], textColor: [255, 255, 255], fontStyle: 'bold' },
+            styles: { fontSize: 9, cellPadding: 6, overflow: 'linebreak', font: 'helvetica' },
+            columnStyles: {
+                0: { cellWidth: 45 },
+                1: { cellWidth: 90 },
+                2: { cellWidth: 65 },
+                3: { cellWidth: 160 },
+                4: { cellWidth: 55, halign: 'right' },
+                5: { cellWidth: 55, halign: 'right' },
+                6: { cellWidth: 55, halign: 'right' }
+            },
+            margin: { left: 40, right: 40 }
+        });
+    } else {
+        // Fallback agar autoTable library bind na ho kisi wajah se
+        alert("PDF Table library generate nahi ho saki, normal layout fallback ho raha hai.");
+    }
+
+    // 6. PDF Save karein automatic file name ke sath
+    let currentToday = new Date().toISOString().slice(0,10);
+    doc.save(`Ledger_History_${currentToday}.pdf`);
 }
 
     
