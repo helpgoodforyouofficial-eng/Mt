@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+r<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -872,15 +872,16 @@ function updateTitleSize(sizeValue){
     })();
 </script>
 
-        <!-- Custom PWA Install Notice Banner (Ab Top Per Show Hoga) -->
-    <!-- Modern PWA Install Banner -->
-<div id="pwa-install-btn" style="display: none; background: #ffffff; color: #2c3e50; padding: 14px 20px; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-bottom: 2px solid #27ae60; align-items: center; justify-content: center; gap: 15px;">
+        <!-- Modern PWA Install Banner - FIXED ID & CLOSE BUTTON -->
+<div id="pwa-install-btn" style="display: none; background: #ffffff; color: #2c3e50; padding: 12px 20px; text-align: center; font-family: sans-serif; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-bottom: 2px solid #27ae60; align-items: center; justify-content: center; gap: 10px;">
     
-    <span style="font-size: 14px; font-weight: 600;">⚡ Bill Generator ko fast chalane ke liye Install karein!</span>
+    <span style="font-size: 13px; font-weight: 600;">⚡ Install App for better experience!</span>
     
-    <button id="pwa-actual-install-click" style="background: #27ae60; color: white; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.3s; box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);">
-        Install Now
-    </button>
+    <!-- ID yahan sahi ki gayi hai -->
+    <button id="pwa-actual-install-click" style="background: #27ae60; color: white; border: none; padding: 6px 16px; border-radius: 20px; font-weight: bold; cursor: pointer;">Install</button>
+    
+    <!-- Close button taake banner ko hataya ja sake -->
+    <button onclick="document.getElementById('pwa-install-btn').style.display='none'" style="background: transparent; border: none; font-size: 18px; cursor: pointer; color: #888;">&times;</button>
 </div>
 
 
