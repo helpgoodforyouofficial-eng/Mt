@@ -368,7 +368,6 @@
     </div>
 </div>
 
-<script>
 // --- PWA Service Worker Registration & Prompt Logic ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -380,7 +379,6 @@ if ('serviceWorker' in navigator) {
 
 let deferredPrompt;
 
-// 1. Jab browser install karne ke liye ready ho
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -391,9 +389,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }
 });
 
-// 2. Click handle karne ke liye jab page poora tayyar ho jaye
 document.addEventListener("DOMContentLoaded", function() {
-    // Click event hum banner ke andar maujood actual button par lagayein ge
     const actualBtn = document.getElementById('pwa-actual-install-click');
     const installBanner = document.getElementById('pwa-install-btn');
     
@@ -407,12 +403,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (installBanner) installBanner.style.setProperty('display', 'none', 'important');
         });
     }
-
-    // TESTING / FORCE SHOW: Layout check karne ke liye niche wali line se '//' hatayein
-    // if(installBanner) installBanner.style.setProperty('display', 'flex', 'important');
 });
 
-// 3. Jab app successfully install ho jaye
 window.addEventListener('appinstalled', (evt) => {
     console.log('PWA was successfully installed!');
     const installBanner = document.getElementById('pwa-install-btn');
@@ -420,7 +412,6 @@ window.addEventListener('appinstalled', (evt) => {
         installBanner.style.setProperty('display', 'none', 'important');
     }
 });
-
 
 // --- Initializations & Variables ---
 let savedItems = JSON.parse(localStorage.getItem("inventory")) || [];
@@ -438,7 +429,6 @@ function syncPaperSize(val) {
     if(customDimsEl) customDimsEl.style.display = val === 'custom' ? 'block' : 'none';
 }
 
-// QR Code Initialization
 if(document.getElementById("qrcode")) {
     (function(siteUrl){
         new QRCode(document.getElementById("qrcode"), { text: siteUrl, width: 60, height: 60 });
@@ -451,133 +441,131 @@ function updateTitleSize(sizeValue){
         mainTitleEl.className = "biz-name " + sizeValue;
     }
 }
-
     
+function updateCurrencySymbol(symbol) {
+    document.querySelectorAll('.cur').forEach(el => { el.innerText = symbol; });
+}
+
+function handleCurrencyChange(selectedValue) {
+    if (selectedValue === 'custom') {
+        let customSymbol = prompt("Enter Country or Currency symbol:", "");
+        if (customSymbol && customSymbol.trim() !== "") {
+            let selectBox = document.getElementById('currency');
+            let newOption = document.createElement('option');
+            newOption.value = customSymbol; newOption.text = customSymbol; newOption.selected = true;
+            selectBox.add(newOption, selectBox.options[selectBox.options.length - 1]);
+            updateCurrencySymbol(customSymbol);
+        } else {
+            document.getElementById('currency').value = 'Rs';
+            updateCurrencySymbol('Rs');
+        }
+    } else { updateCurrencySymbol(selectedValue); }
+}
+
+function addRow() {
+    const tbody = document.getElementById('items');
+    if(!tbody) return;
+    const tr = document.createElement('tr');
+    const rowCount = tbody.rows.length + 1;
+
+    tr.innerHTML = `
+        <td>${rowCount}</td>
+        <td>
+            <div class="editable-input-container">
+                <input type="text" placeholder="Item Name..." class="item-input" autocomplete="off">
+            </div>
+            <div class="suggestion-container"></div>
+        </td>
+        <td><div class="editable-input-container"><input type="number" class="q" value="1" oninput="calc()" onclick="this.select()" style="text-align:center; font-weight:bold;"></div></td>
+        <td><div class="editable-input-container"><input type="number" class="r" value="0" oninput="calc()" onclick="this.select()" style="text-align:right; font-weight:bold;"></div></td>
+        <td class="col-disc"><div class="editable-input-container"><input type="number" class="d" value="0" oninput="calc()" onclick="this.select()" style="text-align:right; font-weight:bold;"></div></td>
+        <td style="text-align:right; font-weight:bold;" class="rt">0.00</td>
+        <td class="no-print rt-col-action">
+            <button class="delete-btn" onclick="this.parentElement.parentElement.remove(); reIndex(); calc();">✖</button>
+        </td>`;
     
-    function updateCurrencySymbol(symbol) {
-        document.querySelectorAll('.cur').forEach(el => { el.innerText = symbol; });
-    }
+    tbody.appendChild(tr);
+    
+    const input = tr.querySelector('.item-input');
+    const suggestBox = tr.querySelector('.suggestion-container');
 
-    function handleCurrencyChange(selectedValue) {
-        if (selectedValue === 'custom') {
-            let customSymbol = prompt("Enter Country or Currency symbol:", "");
-            if (customSymbol && customSymbol.trim() !== "") {
-                let selectBox = document.getElementById('currency');
-                let newOption = document.createElement('option');
-                newOption.value = customSymbol; newOption.text = customSymbol; newOption.selected = true;
-                selectBox.add(newOption, selectBox.options[selectBox.options.length - 1]);
-                updateCurrencySymbol(customSymbol);
-            } else {
-                document.getElementById('currency').value = 'Rs';
-                updateCurrencySymbol('Rs');
-            }
-        } else { updateCurrencySymbol(selectedValue); }
-    }
-
-    function addRow() {
-        const tbody = document.getElementById('items');
-        const tr = document.createElement('tr');
-        const rowCount = tbody.rows.length + 1;
-
-        tr.innerHTML = `
-            <td>${rowCount}</td>
-            <td>
-                <div class="editable-input-container">
-                    <input type="text" placeholder="Item Name..." class="item-input" autocomplete="off">
-                </div>
-                <div class="suggestion-container"></div>
-            </td>
-            <td><div class="editable-input-container"><input type="number" class="q" value="1" oninput="calc()" onclick="this.select()" style="text-align:center; font-weight:bold;"></div></td>
-            <td><div class="editable-input-container"><input type="number" class="r" value="0" oninput="calc()" onclick="this.select()" style="text-align:right; font-weight:bold;"></div></td>
-            <td class="col-disc"><div class="editable-input-container"><input type="number" class="d" value="0" oninput="calc()" onclick="this.select()" style="text-align:right; font-weight:bold;"></div></td>
-            <td style="text-align:right; font-weight:bold;" class="rt">0.00</td>
-            <td class="no-print rt-col-action">
-                <button class="delete-btn" onclick="this.parentElement.parentElement.remove(); reIndex(); calc();">✖</button>
-            </td>`;
-        
-        tbody.appendChild(tr);
-        
-        const input = tr.querySelector('.item-input');
-        const suggestBox = tr.querySelector('.suggestion-container');
-
-        input.addEventListener('input', function() {
-            const val = this.value.toLowerCase();
-            suggestBox.innerHTML = '';
-            if (val.length > 0) {
-                const matches = savedItems.filter(i => i.toLowerCase().includes(val));
-                if (matches.length > 0) {
-                    suggestBox.style.display = 'block';
-                    matches.forEach(m => {
-                        const div = document.createElement('div');
-                        div.className = 'suggestion-item'; div.innerText = m;
-                        div.onclick = function() { input.value = m; suggestBox.style.display = 'none'; calc(); };
-                        suggestBox.appendChild(div);
-                    });
-                } else { suggestBox.style.display = 'none'; }
+    input.addEventListener('input', function() {
+        const val = this.value.toLowerCase();
+        suggestBox.innerHTML = '';
+        if (val.length > 0) {
+            const matches = savedItems.filter(i => i.toLowerCase().includes(val));
+            if (matches.length > 0) {
+                suggestBox.style.display = 'block';
+                matches.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item'; div.innerText = m;
+                    div.onclick = function() { input.value = m; suggestBox.style.display = 'none'; calc(); };
+                    suggestBox.appendChild(div);
+                });
             } else { suggestBox.style.display = 'none'; }
-            calc();
-        });
+        } else { suggestBox.style.display = 'none'; }
+        calc();
+    });
 
-        input.addEventListener('blur', function() {
-            setTimeout(() => { suggestBox.style.display = 'none'; }, 200);
-            const val = this.value.trim();
-            if (val && !savedItems.includes(val)) {
-                savedItems.push(val);
-                localStorage.setItem('inventory', JSON.stringify(savedItems));
+    input.addEventListener('blur', function() {
+        setTimeout(() => { suggestBox.style.display = 'none'; }, 200);
+        const val = this.value.trim();
+        if (val && !savedItems.includes(val)) {
+            savedItems.push(val);
+            localStorage.setItem('inventory', JSON.stringify(savedItems));
+        }
+    });
+
+    input.focus(); applyToggles(); calc();
+}
+
+function reIndex() {
+    document.querySelectorAll("#items tr").forEach(function(row, idx) { 
+        row.cells[0].innerText = idx + 1; 
+    });
+}
+
+function calc() {
+    let subTotal = 0, discountTotal = 0;
+    document.querySelectorAll("#items tr").forEach(row => {
+        const qty = parseFloat(row.querySelector(".q").value) || 0;
+        const rate = parseFloat(row.querySelector(".r").value) || 0;
+        const disc = parseFloat(row.querySelector(".d").value) || 0;
+        const total = (qty * rate) - disc;
+        
+        row.querySelector(".rt").innerText = total.toFixed(2); 
+        subTotal += (qty * rate); 
+        discountTotal += disc;
+    });
+    
+    document.getElementById("sub-val").innerText = subTotal.toFixed(2);
+    document.getElementById("disc-amt").innerText = discountTotal.toFixed(2);
+    
+    const grandTotal = subTotal - discountTotal; 
+    document.getElementById("total-val").innerText = grandTotal.toFixed(2);
+    
+    const paidAmount = parseFloat(document.getElementById("paid").value) || 0;
+    document.getElementById("bal-val").innerText = (grandTotal - paidAmount).toFixed(2);
+}
+
+function captureCustomerName() {
+    const custSpan = document.getElementById("cust-name-field");
+    const addrDiv = document.getElementById("cust-address-field");
+    if (custSpan && addrDiv) {
+        const custName = custSpan.innerText.trim();
+        const custAddr = addrDiv.innerText.trim();
+        if (custName && custName !== "" && custName !== "Counter Sale") {
+            const existingIdx = savedCustomers.findIndex(c => c.name.toLowerCase() === custName.toLowerCase());
+            if (existingIdx > -1) {
+                savedCustomers[existingIdx].address = custAddr;
+            } else {
+                savedCustomers.push({ name: custName, address: custAddr });
             }
-        });
-
-        input.focus(); applyToggles(); calc();
-    }
-
-    function reIndex() {
-        document.querySelectorAll("#items tr").forEach(function(row, idx) { 
-            row.cells[0].innerText = idx + 1; 
-        });
-    }
-
-    function calc() {
-        let subTotal = 0, discountTotal = 0;
-        document.querySelectorAll("#items tr").forEach(row => {
-            const qty = parseFloat(row.querySelector(".q").value) || 0;
-            const rate = parseFloat(row.querySelector(".r").value) || 0;
-            const disc = parseFloat(row.querySelector(".d").value) || 0;
-            const total = (qty * rate) - disc;
-            
-            row.querySelector(".rt").innerText = total.toFixed(2); 
-            subTotal += (qty * rate); 
-            discountTotal += disc;
-        });
-        
-        document.getElementById("sub-val").innerText = subTotal.toFixed(2);
-        document.getElementById("disc-amt").innerText = discountTotal.toFixed(2);
-        
-        const grandTotal = subTotal - discountTotal; 
-        document.getElementById("total-val").innerText = grandTotal.toFixed(2);
-        
-        const paidAmount = parseFloat(document.getElementById("paid").value) || 0;
-        document.getElementById("bal-val").innerText = (grandTotal - paidAmount).toFixed(2);
-    }
-
-    function captureCustomerName() {
-        const custSpan = document.getElementById("cust-name-field");
-        const addrDiv = document.getElementById("cust-address-field");
-        if (custSpan && addrDiv) {
-            const custName = custSpan.innerText.trim();
-            const custAddr = addrDiv.innerText.trim();
-            if (custName && custName !== "" && custName !== "Counter Sale") {
-                const existingIdx = savedCustomers.findIndex(c => c.name.toLowerCase() === custName.toLowerCase());
-                if (existingIdx > -1) {
-                    savedCustomers[existingIdx].address = custAddr;
-                } else {
-                    savedCustomers.push({ name: custName, address: custAddr });
-                }
-                localStorage.setItem("customer_profiles", JSON.stringify(savedCustomers));
-            }
+            localStorage.setItem("customer_profiles", JSON.stringify(savedCustomers));
         }
     }
+}
 
-   // --- Updated Bill Logging Logic with Paid/Balance ---
 function logBillToHistory() {
     const billNo = document.getElementById("bill-no").innerText.trim();
     const customer = document.getElementById("cust-name-field").innerText.trim();
@@ -597,7 +585,6 @@ function logBillToHistory() {
         }
     });
 
-    // Duplicate entry check blocking
     if(savedBillsLog.some(b => b.billNo === billNo && b.customer === customer && b.totalAmount === (currencySymbol + " " + totalAmount))) {
         return; 
     }
@@ -611,13 +598,14 @@ function logBillToHistory() {
         paidAmount: currencySymbol + " " + paidAmount.toFixed(2),
         balanceAmount: currencySymbol + " " + balanceAmount
     };
-    savedBillsLog.unshift(newLog); // Naya bill top pe dikhega
+    savedBillsLog.unshift(newLog); 
     localStorage.setItem("bills_history_log", JSON.stringify(savedBillsLog));
     renderBillsHistory();
 }
 
 function renderBillsHistory() {
     const tbody = document.getElementById("bill-history-rows");
+    if(!tbody) return;
     if (savedBillsLog.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#999; padding:20px;">No bill records found yet. Save/Print a bill to log details.</td></tr>`;
         return;
@@ -628,7 +616,6 @@ function renderBillsHistory() {
         const tr = document.createElement("tr");
         let prodHTML = b.products.map(p => `<span class="prod-tag">${p}</span>`).join(" ");
         
-        // Checking if balance is positive to highlight in red
         const isPending = parseFloat(b.balanceAmount.replace(/[^0-9.-]/g, '')) > 0;
         const balStyle = isPending ? "font-weight:bold; color:red; text-align:right;" : "font-weight:bold; color:#777; text-align:right;";
 
@@ -645,7 +632,15 @@ function renderBillsHistory() {
     });
 }
 
-// 🔥 --- FULLY FIXED & TESTED PDF DOWNLOAD FUNCTION ---
+function clearAllBillsHistory() {
+    if(confirm("Are you sure you want to permanently clear all bills records history?")) {
+        savedBillsLog = [];
+        localStorage.removeItem("bills_history_log");
+        renderBillsHistory();
+    }
+}
+
+// 🔥 --- FULLY FIX SINGLE CLICK DOWNLOAD FUNCTION ---
 function downloadHistoryPDF() {
     let historyData = JSON.parse(localStorage.getItem("bills_history_log")) || [];
     
@@ -654,7 +649,6 @@ function downloadHistoryPDF() {
         return;
     }
 
-    // LIBRARY INITIALIZATION FIXED (Ab crash nahi hoga)
     if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
         alert("PDF Library properly load nahi ho saki. Page ko aik bar refresh karein!");
         return;
@@ -663,7 +657,6 @@ function downloadHistoryPDF() {
     const jsPDF = window.jspdf.jsPDF;
     const doc = new jsPDF('p', 'pt', 'a4');
 
-    // Header Styling
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     doc.setTextColor(44, 62, 80);
@@ -715,7 +708,6 @@ function downloadHistoryPDF() {
         ]);
     });
 
-    // Final Total Row Footer
     tableRows.push([
         { content: 'Total Summary', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 240, 240] } },
         { content: grandTotalSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
@@ -723,7 +715,6 @@ function downloadHistoryPDF() {
         { content: balanceSum.toFixed(2), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }
     ]);
 
-    // AUTOTABLE SAFE CALL
     try {
         doc.autoTable({
             startY: 120,
@@ -745,100 +736,103 @@ function downloadHistoryPDF() {
         });
     } catch (e) {
         console.error("AutoTable Error:", e);
-        alert("Table Format generate karne mein masla aya hai, basic format download ho raha hai.");
     }
 
     let currentToday = new Date().toISOString().slice(0,10);
     doc.save(`Ledger_History_${currentToday}.pdf`);
 }
 
-
-
-
-    function applyToggles() {
-        document.querySelectorAll('.toggle').forEach(t => {
-            const target = t.getAttribute('data-target');
-            document.querySelectorAll('.' + target).forEach(el => el.style.display = t.checked ? '' : 'none');
-        });
-    }
-
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('devModal')) document.getElementById('devModal').style.display = "none";
-        if (event.target == document.getElementById('printModal')) document.getElementById('printModal').style.display = "none";
-    }
-
-    document.querySelectorAll('.toggle').forEach(t => t.addEventListener('change', applyToggles));
-    document.getElementById('date-field').valueAsDate = new Date();
-    document.getElementById('time-field').value = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
-    
-    addRow();
-
-    document.addEventListener("DOMContentLoaded", function() {
-        renderBillsHistory();
-
-        const lastBill = localStorage.getItem("last_bill_no");
-        if (lastBill) {
-            document.getElementById("bill-no").innerText = lastBill;
-        }
-
-        const custSpan = document.getElementById("cust-name-field");
-        const addrDiv = document.getElementById("cust-address-field");
-        if (custSpan && addrDiv) {
-            const wrap = custSpan.parentElement; wrap.style.position = "relative";
-            
-            const cSuggestBox = document.createElement("div");
-            cSuggestBox.className = "suggestion-container";
-            cSuggestBox.style.position = "absolute"; cSuggestBox.style.top = "100%"; cSuggestBox.style.left = "0"; cSuggestBox.style.width = "200px"; cSuggestBox.style.zIndex = "99999";
-            wrap.appendChild(cSuggestBox);
-
-            custSpan.addEventListener("input", function() {
-                const val = this.innerText.trim().toLowerCase();
-                cSuggestBox.innerHTML = '';
-                if (val.length > 0) {
-                    const matches = savedCustomers.filter(c => c.name.toLowerCase().includes(val));
-                    if (matches.length > 0) {
-                        cSuggestBox.style.display = 'block';
-                        matches.forEach(m => {
-                            const div = document.createElement('div');
-                            div.className = 'suggestion-item'; div.innerText = m.name; div.style.cursor = "pointer";
-                            div.onclick = function() {
-                                custSpan.innerText = m.name; addrDiv.innerText = m.address || "#"; cSuggestBox.style.display = 'none';
-                                const range = document.createRange(); const sel = window.getSelection();
-                                range.selectNodeContents(custSpan); range.collapse(false);
-                                sel.removeAllRanges(); sel.addRange(range);
-                            };
-                            cSuggestBox.appendChild(div);
-                        });
-                    } else { cSuggestBox.style.display = 'none'; }
-                } else { cSuggestBox.style.display = 'none'; }
-            });
-
-            custSpan.addEventListener('blur', function() { setTimeout(() => { cSuggestBox.style.display = 'none'; }, 200); });
-        }
-        
-        document.getElementById('pageSize').addEventListener('change', function() {
-            document.getElementById('topPageSize').value = this.value;
-            document.getElementById('topCustomDims').style.display = this.value === 'custom' ? 'inline-block' : 'none';
-        });
+function applyToggles() {
+    document.querySelectorAll('.toggle').forEach(t => {
+        const target = t.getAttribute('data-target');
+        document.querySelectorAll('.' + target).forEach(el => el.style.display = t.checked ? '' : 'none');
     });
+}
 
-    (function(){
-        const devInfo = { name: "Wasi Developers", whatsapp: "923346800959", displayPhone: "0334-6800959" };
-        const contactDiv = document.getElementById('wasi-contact');
-        const waLink = document.getElementById('modal-wa-link');
-        const brandingArea = document.querySelector('.permanent-branding');
+window.onclick = function(event) {
+    if (event.target == document.getElementById('devModal')) document.getElementById('devModal').style.display = "none";
+    if (event.target == document.getElementById('printModal')) document.getElementById('printModal').style.display = "none";
+}
+
+// --- DOM Content Loaded & Init Event Hooks ---
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.toggle').forEach(t => t.addEventListener('change', applyToggles));
+    
+    const dateField = document.getElementById('date-field');
+    const timeField = document.getElementById('time-field');
+    if(dateField) dateField.valueAsDate = new Date();
+    if(timeField) timeField.value = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+    
+    // Yahan execute hoga taake structure ready ho
+    addRow();
+    renderBillsHistory();
+
+    const lastBill = localStorage.getItem("last_bill_no");
+    if (lastBill && document.getElementById("bill-no")) {
+        document.getElementById("bill-no").innerText = lastBill;
+    }
+
+    const custSpan = document.getElementById("cust-name-field");
+    const addrDiv = document.getElementById("cust-address-field");
+    if (custSpan && addrDiv) {
+        const wrap = custSpan.parentElement; wrap.style.position = "relative";
         
-        if (contactDiv && !contactDiv.innerHTML.includes('contenteditable')) {
-            contactDiv.innerHTML = 'Mobile: <div class="editable-text-container"><div contenteditable="true" style="display:inline-block; font-weight: normal; outline:none; min-width:100px; word-break:break-word; vertical-align:middle;">0300-8002765</div></div>';
-        }
-        
-        const updateUI = () => {
-            if (brandingArea && brandingArea.innerHTML !== 'https://freebills.netlify.app/') { brandingArea.innerHTML = 'https://freebills.netlify.app/'; }
-            if(waLink) { waLink.setAttribute('href', "https://wa.me/" + devInfo.whatsapp); }
-        };
-        updateUI(); setInterval(updateUI, 1500);
-    })();
-</script>
+        const cSuggestBox = document.createElement("div");
+        cSuggestBox.className = "suggestion-container";
+        cSuggestBox.style.position = "absolute"; cSuggestBox.style.top = "100%"; cSuggestBox.style.left = "0"; cSuggestBox.style.width = "200px"; cSuggestBox.style.zIndex = "99999";
+        wrap.appendChild(cSuggestBox);
+
+        custSpan.addEventListener("input", function() {
+            const val = this.innerText.trim().toLowerCase();
+            cSuggestBox.innerHTML = '';
+            if (val.length > 0) {
+                const matches = savedCustomers.filter(c => c.name.toLowerCase().includes(val));
+                if (matches.length > 0) {
+                    cSuggestBox.style.display = 'block';
+                    matches.forEach(m => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item'; div.innerText = m.name; div.style.cursor = "pointer";
+                        div.onclick = function() {
+                            custSpan.innerText = m.name; addrDiv.innerText = m.address || "#"; cSuggestBox.style.display = 'none';
+                            const range = document.createRange(); const sel = window.getSelection();
+                            range.selectNodeContents(custSpan); range.collapse(false);
+                            sel.removeAllRanges(); sel.addRange(range);
+                        };
+                        cSuggestBox.appendChild(div);
+                    });
+                } else { cSuggestBox.style.display = 'none'; }
+            } else { cSuggestBox.style.display = 'none'; }
+        });
+
+        custSpan.addEventListener('blur', function() { setTimeout(() => { cSuggestBox.style.display = 'none'; }, 200); });
+    }
+    
+    const pageSizeEl = document.getElementById('pageSize');
+    if(pageSizeEl) {
+        pageSizeEl.addEventListener('change', function() {
+            if(document.getElementById('topPageSize')) document.getElementById('topPageSize').value = this.value;
+            if(document.getElementById('topCustomDims')) document.getElementById('topCustomDims').style.display = this.value === 'custom' ? 'inline-block' : 'none';
+        });
+    }
+});
+
+(function(){
+    const devInfo = { name: "Wasi Developers", whatsapp: "923346800959", displayPhone: "0334-6800959" };
+    const contactDiv = document.getElementById('wasi-contact');
+    const waLink = document.getElementById('modal-wa-link');
+    const brandingArea = document.querySelector('.permanent-branding');
+    
+    if (contactDiv && !contactDiv.innerHTML.includes('contenteditable')) {
+        contactDiv.innerHTML = 'Mobile: <div class="editable-text-container"><div contenteditable="true" style="display:inline-block; font-weight: normal; outline:none; min-width:100px; word-break:break-word; vertical-align:middle;">0300-8002765</div></div>';
+    }
+    
+    const updateUI = () => {
+        if (brandingArea && brandingArea.innerHTML !== 'https://freebills.netlify.app/') { brandingArea.innerHTML = 'https://freebills.netlify.app/'; }
+        if(waLink) { waLink.setAttribute('href', "https://wa.me/" + devInfo.whatsapp); }
+    };
+    updateUI(); setInterval(updateUI, 1500);
+})();
+
 
         <!-- Modern PWA Install Banner - FIXED ID & CLOSE BUTTON -->
 <div id="pwa-install-btn" style="display: none; background: #ffffff; color: #2c3e50; padding: 12px 20px; text-align: center; font-family: sans-serif; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border-bottom: 2px solid #27ae60; align-items: center; justify-content: center; gap: 10px;">
