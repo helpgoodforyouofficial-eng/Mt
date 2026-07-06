@@ -363,7 +363,6 @@
 </div>
 
 <script>
-<script>
     // --- PWA Service Worker Registration & Prompt Logic (Fully Fixed) ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -416,26 +415,6 @@ window.addEventListener('appinstalled', (evt) => {
         installBtn.style.setProperty('display', 'none', 'important');
     }
 });
-
-
-    // --- Initializations ---
-    let savedItems = JSON.parse(localStorage.getItem("inventory")) || [];
-    let savedCustomers = JSON.parse(localStorage.getItem("customer_profiles")) || [{"name": "Counter Sale", "address": "#"}];
-    let savedBillsLog = JSON.parse(localStorage.getItem("bills_history_log")) || [];
-    
-    function syncPaperSize(val) {
-        document.getElementById('pageSize').value = val;
-        document.getElementById('topCustomDims').style.display = val === 'custom' ? 'inline-block' : 'none';
-        document.getElementById('customDims').style.display = val === 'custom' ? 'block' : 'none';
-    }
-
-    (function(siteUrl){
-        new QRCode(document.getElementById("qrcode"), { text: siteUrl, width: 60, height: 60 });
-    })("https://freebills.netlify.app/");
-
-    function updateTitleSize(sizeValue){
-        document.getElementById("main-title").className = "biz-name " + sizeValue;
-    }
 
     // --- Initializations ---
     let savedItems = JSON.parse(localStorage.getItem("inventory")) || [];
