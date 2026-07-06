@@ -334,32 +334,6 @@
     </div>
 </div>
 
-<!-- --- Updated History Dashboard Panel --- -->
-<div class="record-panel no-print">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:15px;">
-        <h3 style="margin:0; color: var(--primary);">📋 Saved Bills History / Ledger</h3>
-        <button onclick="clearAllBillsHistory()" style="background:#e74c3c; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;">Clear All History</button>
-    </div>
-    <div style="overflow-x:auto;">
-        <table class="record-table">
-            <thead>
-                <tr>
-                    <th width="10%">Bill No</th>
-                    <th width="18%">Customer</th>
-                    <th width="12%">Date</th>
-                    <th width="30%">Products Details (Qty x Rate)</th>
-                    <th width="10%">Grand Total</th>
-                    <th width="10%">Received</th>
-                    <th width="10%">Balance</th>
-                </tr>
-            </thead>
-            <tbody id="bill-history-rows">
-                <tr><td colspan="7" style="text-align:center; color:#999; padding:20px;">No bill records found yet. Save/Print a bill to log details.</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
 <div id="printModal" class="modal no-print">
     <div class="modal-content">
         <h4>Select Paper Size</h4>
