@@ -886,7 +886,67 @@ function updateTitleSize(sizeValue){
     <button onclick="document.getElementById('pwa-install-btn').style.display='none'" style="background: transparent; border: none; font-size: 18px; cursor: pointer; color: #888;">&times;</button>
 </div>
 
+// ==========================================
+// 🛡️ --- COMPLETE SECURITY & ANTI-TAMPER BLOCK ---
+// ==========================================
 
+// 1. 🚫 INSPECT ELEMENT & RIGHT CLICK BLOCKER
+document.addEventListener('contextmenu', event => event.preventDefault()); // Right-click block
+
+document.onkeydown = function(e) {
+    if (e.keyCode == 123) return false; // F12 key block
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I block
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J block
+    if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U (View Source) block
+};
+
+// 2. ⚠️ STRICT CODE INTEGRITY VERIFICATION (3 SECONDS LOCK)
+(function() {
+    // NOTE: Jab aapka poora script final ho jaye, to actual character length yahan adjust kar lena.
+    const CORRECT_HASH_SIGNATURE = 5580; 
+
+    const enforceSecurityLock = () => {
+        try {
+            // Un main functions ki list jinko chori se bachana hai
+            const criticalSpecs = [
+                calc, 
+                addRow, 
+                reIndex, 
+                logBillToHistory, 
+                downloadHistoryPDF, 
+                applyToggles
+            ];
+            
+            let currentStrippedSource = ''; 
+            criticalSpecs.forEach(fn => { 
+                currentStrippedSource += fn.toString().replace(/\s+/g,''); 
+            });
+
+            const currentLength = currentStrippedSource.length;
+
+            // Agar kisi ne code mein tabdeeli ki to character length badal jayegi
+            if (currentLength !== CORRECT_HASH_SIGNATURE) {
+                document.body.innerHTML = `
+                    <div style="position:fixed; top:0; left:0; width:100vw; height:100vh; background-color:#7f1d1d; color:#ffffff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif; padding:20px; text-align:center; z-index:999999;">
+                        <h1 style="font-size:42px; margin-bottom:20px;">⚠️ CODE TAMPERING DETECTED</h1>
+                        <p style="font-size:18px; max-width:600px; line-height:1.6; margin-bottom:30px;">
+                            Unauthorized modifications to the original source code or the developer's intellectual property have been detected. In accordance with our security policy, your access to this application has been permanently revoked.
+                        </p>
+                        <div style="background:#000; padding:15px; border-radius:5px; font-family:monospace; font-size:14px; color:#ef4444;">
+                            Error Code: ERR_AUTH_INTEGRITY_VIOLATION
+                        </div>
+                    </div>
+                `;
+                // Page ko bar bar refresh karke crash karne ke liye
+                setInterval(() => { window.location.reload(); }, 1000);
+            }
+        } catch(e) {
+            document.body.innerHTML = "Security system bypassed. Access Denied.";
+        }
+    };
+    setTimeout(enforceSecurityLock, 3000); // 3 second ka delay
+})();
+    
 
 </body>
 </html>
