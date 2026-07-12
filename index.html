@@ -922,7 +922,15 @@ document.onkeydown = function(e) {
                 currentStrippedSource += fn.toString().replace(/\s+/g,''); 
             });
 
+            
             const currentLength = currentStrippedSource.length;
+
+// 👇 Yeh line mobile par screen par ek popup box dikhaye gi
+alert("🔥 AAPKA ORIGINAL CODE SIZE YEH HAI: " + currentLength);
+
+if (currentLength !== CORRECT_HASH_SIGNATURE) {
+    
+            
 
             // Agar kisi ne code mein tabdeeli ki to character length badal jayegi
             if (currentLength !== CORRECT_HASH_SIGNATURE) {
