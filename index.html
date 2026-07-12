@@ -904,15 +904,13 @@ document.onkeydown = function(e) {
 
 // 2. ⚠️ STRICT CODE INTEGRITY VERIFICATION (3 SECONDS LOCK)
 (function() {
-    // NOTE: Jab aapka popup chal jaye, to jo number wahan dikhe usay yahan likh dena
+    // 🌟 AAPKA NEW VERIFIED CODE SIZE: Yahan 4341 set kar diya hai!
     const CORRECT_HASH_SIGNATURE = 4341; 
 
     const enforceSecurityLock = () => {
         try {
-            // Hum safe tareeqe se check karenge jo functions available hain sirf unhi ko scan karein
             let currentStrippedSource = ''; 
             
-            // SIKANDAR SECURITY SYSTEM: Only checks existing functions to prevent crashes
             const safeFunctions = [];
             if (typeof calc !== 'undefined') safeFunctions.push(calc);
             if (typeof addRow !== 'undefined') safeFunctions.push(addRow);
@@ -927,11 +925,9 @@ document.onkeydown = function(e) {
 
             const currentLength = currentStrippedSource.length;
 
-            // 1. 🌟 YEH LINE AAPKO MOBILE SCREEN PAR POPUP DIKHAYE GI!
-            alert("🔥 CONGRATULATIONS!\n\nAAPKA ORIGINAL CODE SIZE YEH HAI:\n\n👉 " + currentLength + " 👈\n\nIs number ko note kar lein aur code mein save karein.");
-
-            // 2. Yeh line console mein print karegi (PC ke liye)
-            console.log("🔥 WASI DEVELOPER - AAPKA ORIGINAL CODE SIZE YEH HAI:", currentLength);
+            // 👇 ALERT KO COMMENT KAR DIYA HAI: Taake baar baar popup na aaye. 
+            // Agar kabhi dobara check karna ho to shuru se '//' hata dena.
+            // alert("🔥 AAPKA ORIGINAL CODE SIZE: " + currentLength);
 
             // Agar kisi ne code mein tabdeeli ki to character length badal jayegi
             if (currentLength !== CORRECT_HASH_SIGNATURE) {
@@ -950,15 +946,15 @@ document.onkeydown = function(e) {
                         </div>
                     </div>
                 `;
-                // Page ko refresh lock karne ke liye
-                setInterval(() => { window.location.reload(); }, 1000);
+                // Browser tab ko freeze rakhne ke liye hard redirect lock
+                setInterval(() => { window.location.reload(); }, 500);
             }
         } catch(e) {
-            document.body.innerHTML = "Security system bypassed. Access Denied. Contact Wasi Developers at +923346800959. <br><br>Error details: " + e.message;
+            document.body.innerHTML = "Security system bypassed. Access Denied. Contact Wasi Developers at +923346800959.";
         }
     };
     
-    // Timeout set hai, save kar ke chalayein ge to direct popup mobile par screen ke samne aayega
+    // 🔥 SECURITY ACTIVE! 3 second baad system background mein check karega.
     setTimeout(enforceSecurityLock, 3000); 
 })();
 </script>
