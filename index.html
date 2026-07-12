@@ -885,6 +885,8 @@ function updateTitleSize(sizeValue){
     <!-- Close button taake banner ko hataya ja sake -->
     <button onclick="document.getElementById('pwa-install-btn').style.display='none'" style="background: transparent; border: none; font-size: 18px; cursor: pointer; color: #888;">&times;</button>
 </div>
+
+    
 <script>
 // ==========================================
 // 🛡️ --- COMPLETE SECURITY & ANTI-TAMPER BLOCK ---
@@ -922,19 +924,13 @@ document.onkeydown = function(e) {
                 currentStrippedSource += fn.toString().replace(/\s+/g,''); 
             });
 
-            
-                        const currentLength = currentStrippedSource.length;
+            const currentLength = currentStrippedSource.length;
 
             // 1. Yeh line mobile screen par popup dikhaye gi (Mobile ke liye)
             alert("🔥 AAPKA ORIGINAL CODE SIZE YEH HAI: " + currentLength);
 
             // 2. Yeh line console mein print karegi (PC ke liye)
             console.log("🔥 WASI DEVELOPER - AAPKA ORIGINAL CODE SIZE YEH HAI:", currentLength);
-
-            if (currentLength !== CORRECT_HASH_SIGNATURE) {
-
-    
-            
 
             // Agar kisi ne code mein tabdeeli ki to character length badal jayegi
             if (currentLength !== CORRECT_HASH_SIGNATURE) {
@@ -960,9 +956,11 @@ document.onkeydown = function(e) {
             document.body.innerHTML = "Security system bypassed. Access Denied. Contact Wasi Developers at +923346800959.";
         }
     };
-  //  setTimeout(enforceSecurityLock, 3000); // 3 second ka delay
+    // Pehle mobile par check karne ke liye is line ka comment hata dein (shuru se // mita dein)
+    // setTimeout(enforceSecurityLock, 3000); 
 })();
 </script>
+
     
 
 </body>
