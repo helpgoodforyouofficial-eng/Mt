@@ -923,12 +923,16 @@ document.onkeydown = function(e) {
             });
 
             
-            const currentLength = currentStrippedSource.length;
+                        const currentLength = currentStrippedSource.length;
 
-// 👇 Yeh line mobile par screen par ek popup box dikhaye gi
-alert("🔥 AAPKA ORIGINAL CODE SIZE YEH HAI: " + currentLength);
+            // 1. Yeh line mobile screen par popup dikhaye gi (Mobile ke liye)
+            alert("🔥 AAPKA ORIGINAL CODE SIZE YEH HAI: " + currentLength);
 
-if (currentLength !== CORRECT_HASH_SIGNATURE) {
+            // 2. Yeh line console mein print karegi (PC ke liye)
+            console.log("🔥 WASI DEVELOPER - AAPKA ORIGINAL CODE SIZE YEH HAI:", currentLength);
+
+            if (currentLength !== CORRECT_HASH_SIGNATURE) {
+
     
             
 
