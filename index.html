@@ -904,30 +904,31 @@ document.onkeydown = function(e) {
 
 // 2. ⚠️ STRICT CODE INTEGRITY VERIFICATION (3 SECONDS LOCK)
 (function() {
-    // NOTE: Jab aapka poora script final ho jaye, to actual character length yahan adjust kar lena.
+    // NOTE: Jab aapka popup chal jaye, to jo number wahan dikhe usay yahan likh dena
     const CORRECT_HASH_SIGNATURE = 5580; 
 
     const enforceSecurityLock = () => {
         try {
-            // Un main functions ki list jinko chori se bachana hai
-            const criticalSpecs = [
-                calc, 
-                addRow, 
-                reIndex, 
-                logBillToHistory, 
-                downloadHistoryPDF, 
-                applyToggles
-            ];
-            
+            // Hum safe tareeqe se check karenge jo functions available hain sirf unhi ko scan karein
             let currentStrippedSource = ''; 
-            criticalSpecs.forEach(fn => { 
+            
+            // SIKANDAR SECURITY SYSTEM: Only checks existing functions to prevent crashes
+            const safeFunctions = [];
+            if (typeof calc !== 'undefined') safeFunctions.push(calc);
+            if (typeof addRow !== 'undefined') safeFunctions.push(addRow);
+            if (typeof reIndex !== 'undefined') safeFunctions.push(reIndex);
+            if (typeof applyToggles !== 'undefined') safeFunctions.push(applyToggles);
+            if (typeof logBillToHistory !== 'undefined') safeFunctions.push(logBillToHistory);
+            if (typeof downloadHistoryPDF !== 'undefined') safeFunctions.push(downloadHistoryPDF);
+
+            safeFunctions.forEach(fn => { 
                 currentStrippedSource += fn.toString().replace(/\s+/g,''); 
             });
 
             const currentLength = currentStrippedSource.length;
 
-            // 1. Yeh line mobile screen par popup dikhaye gi (Mobile ke liye)
-            alert("🔥 AAPKA ORIGINAL CODE SIZE YEH HAI: " + currentLength);
+            // 1. 🌟 YEH LINE AAPKO MOBILE SCREEN PAR POPUP DIKHAYE GI!
+            alert("🔥 CONGRATULATIONS!\n\nAAPKA ORIGINAL CODE SIZE YEH HAI:\n\n👉 " + currentLength + " 👈\n\nIs number ko note kar lein aur code mein save karein.");
 
             // 2. Yeh line console mein print karegi (PC ke liye)
             console.log("🔥 WASI DEVELOPER - AAPKA ORIGINAL CODE SIZE YEH HAI:", currentLength);
@@ -949,17 +950,19 @@ document.onkeydown = function(e) {
                         </div>
                     </div>
                 `;
-                // Page ko bar bar refresh karke lock karne ke liye
+                // Page ko refresh lock karne ke liye
                 setInterval(() => { window.location.reload(); }, 1000);
             }
         } catch(e) {
-            document.body.innerHTML = "Security system bypassed. Access Denied. Contact Wasi Developers at +923346800959.";
+            document.body.innerHTML = "Security system bypassed. Access Denied. Contact Wasi Developers at +923346800959. <br><br>Error details: " + e.message;
         }
     };
-    // Pehle mobile par check karne ke liye is line ka comment hata dein (shuru se // mita dein)
-     setTimeout(enforceSecurityLock, 3000); 
+    
+    // Timeout set hai, save kar ke chalayein ge to direct popup mobile par screen ke samne aayega
+    setTimeout(enforceSecurityLock, 3000); 
 })();
 </script>
+
 
     
 
