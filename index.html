@@ -162,13 +162,15 @@
         <label><input type="radio" name="tsize" value="title-medium" onclick="updateTitleSize(this.value)"> Medium</label>
         <label><input type="radio" name="tsize" value="title-large" checked onclick="updateTitleSize(this.value)"> Large</label>
     </div>
-    <div class="config-grid">
-        <label class="config-item"><input type="checkbox" class="toggle" data-target="date-wrap" checked> Show Date</label>
-        <label class="config-item"><input type="checkbox" class="toggle" data-target="time-wrap" checked> Show Time</label>
-        <label class="config-item"><input type="checkbox" class="toggle" data-target="ntn-wrap" > Show NTN</label>
-        
-        <label class="config-item"><input type="checkbox" class="toggle" data-target="col-disc"  id="disc-master"> Discount</label>
-        
+            <div class="config-grid">
+        <label class="config-item"><input type="checkbox" class="toggle" data-target="date-wrap" checked style="transform: scale(1.25); margin-right: 5px; cursor: pointer;"> Show Date</label>
+        <label class="config-item"><input type="checkbox" class="toggle" data-target="time-wrap" checked style="transform: scale(1.25); margin-right: 5px; cursor: pointer;"> Show Time</label>
+        <label class="config-item"><input type="checkbox" class="toggle" data-target="ntn-wrap" style="transform: scale(1.25); margin-right: 5px; cursor: pointer;"> Show NTN</label>
+        <label class="config-item"><input type="checkbox" class="toggle" data-target="col-disc" id="disc-master" style="transform: scale(1.25); margin-right: 5px; cursor: pointer;"> Discount</label>
+        <label class="config-item"><input type="checkbox" class="toggle" data-target="tax-row" id="tax-master" style="transform: scale(1.25); margin-right: 5px; cursor: pointer;"> Tax (GST)</label>
+        <label class="config-item"><input type="checkbox" class="toggle" data-target="note-row" id="note-master" style="transform: scale(1.25); margin-right: 5px; cursor: pointer;"> Show Note</label>
+  
+
         <span class="config-item">Paper Size:
             <select id="topPageSize" onchange="syncPaperSize(this.value)" style="width: 130px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; background: white; height: auto;">
                 <option value="A4" selected>Standard A4</option>
@@ -218,7 +220,7 @@
             </select>
         </span>
          <!-- Yahan par version badge add kiya hai taake pata chale naya code aa gaya hai -->
-        <span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 10px;">v71</span>
+        <span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 10px;">v73</span>
     </div>
 </div>
 
@@ -279,14 +281,74 @@
     <button class="btn-add no-print" onclick="addRow()">+ Add New Item</button>
     
     <div class="summary-box">
-        <table class="sum-table">
-            <tr><td>Sub Total:</td><td><span class="cur">Rs</span> <span id="sub-val">0.00</span></td></tr>
-            <tr class="col-disc" style="color: green;"><td>Discount:</td><td>- <span id="disc-amt">0.00</span></td></tr>
-            <tr style="font-weight:bold; font-size:1.25em; border-top: 2px solid #333;"><td>Grand Total:</td><td><span class="cur">Rs</span> <span id="total-val">0.00</span></td></tr>
-            <tr><td>Received:</td><td><div class="editable-text-container" style="padding-right:15px;"><input type="number" id="paid" value="0" oninput="calc()" style="text-align:right; font-weight:bold; width:95px; height:30px; line-height:30px; padding-bottom:2px; display:inline-block; vertical-align:middle;" onclick="this.select()"></div></td></tr>
-            <tr style="color:red; font-weight:bold;"><td>Pending Balance:</td><td><span class="cur">Rs</span> <span id="bal-val">0.00</span></td></tr>
-        </table>
+    <table class="sum-table">
+        <tr>
+            <td>Sub Total:</td>
+            <td><span class="cur">Rs</span> <span id="sub-val">0.00</span></td>
+        </tr>
+        
+        <tr class="col-disc" style="color: green; display: none;">
+            <td>Discount:</td>
+            <td>- <span id="disc-amt">0.00</span></td>
+        </tr>
+
+        <tr class="tax-row" style="color: #c0392b; display: none;">
+            <td>
+                Tax (GST <span id="tax-rate-field" contenteditable="true" style="border-bottom: 1px dashed #c0392b; padding: 0 2px; outline: none; font-weight: bold; display: inline-block;">2.5</span>% 
+                <span class="no-print" style="font-size: 0.85em; color: #888; margin-left: 2px; cursor: pointer;">✏️</span>):
+            </td>
+            <td>+ <span id="tax-amount">0.00</span></td>
+        </tr>
+
+        <tr style="font-weight:bold; font-size:1.25em; border-top: 2px solid #333;">
+            <td>Grand Total:</td>
+            <td><span class="cur">Rs</span> <span id="total-val">0.00</span></td>
+        </tr>
+
+        <!-- 🆕 EDITABLE PREVIOUS BALANCE BOX -->
+        <tr style="color: #7f8c8d; font-weight: bold;">
+            <td>Previous Balance:</td>
+            <td>
+                <div class="editable-text-container" style="padding-right:15px;">
+                    <input type="number" id="prev-bal-val" value="0" oninput="calc()" style="text-align:right; font-weight:bold; width:95px; height:30px; line-height:30px; padding-bottom:2px; display:inline-block; vertical-align:middle; color: #7f8c8d;" onclick="this.select()">
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>Received:</td>
+            <td>
+                <div class="editable-text-container" style="padding-right:15px;">
+                    <input type="number" id="paid" value="0" oninput="calc()" style="text-align:right; font-weight:bold; width:95px; height:30px; line-height:30px; padding-bottom:2px; display:inline-block; vertical-align:middle;" onclick="this.select()">
+                </div>
+            </td>
+        </tr>
+        <tr style="color:red; font-weight:bold;">
+            <td>Total Pending Balance:</td>
+            <td><span class="cur">Rs</span> <span id="bal-val">0.00</span></td>
+        </tr>
+    </table>    
+</div>
+
+
+
+
+<!-- 📝 MULTI-LANGUAGE ADJUSTABLE NOTE BOX (FIXED MIN-WIDTH & RTL/LTR SENSOR) -->
+<div class="note-row" style="position: absolute; left: 190px; right: 210px; bottom: 10px; display: none; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px; box-sizing: border-box;">
+    <!-- Title Section (Isme bhi text-align: start hai taake heading bhi language ke hisab se shift ho sake) -->
+    <div dir="auto" style="font-weight: bold; font-size: 11px; color: #555; margin-bottom: 2px; text-align: start;">
+        Note / Terms: <span class="no-print" style="font-size: 0.85em; color: #888; margin-left: 2px; cursor: pointer;">✏️</span>
     </div>
+    
+    <!-- Note Content (min-width, dir="auto", aur text-align: start ke sath) -->
+    <div id="note-body" contenteditable="true" dir="auto" style="border: 1px dashed #ccc; padding: 6px; border-radius: 4px; font-size: 11px; min-height: 40px; min-width: 250px; width: fit-content; max-width: 100%; color: #333; outline: none; background: rgba(250, 250, 250, 0.95); line-height: 1.3; white-space: normal; text-align: start; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;" placeholder="Write note...">1. Please clear the bill amount within 7 days.
+2. Kindly check the expiry of the items on the spot.
+3. The distribution is not responsible for any personal transactions with the salesman.
+4. For expired items claim, please inform us 1 month in advance.
+</div>
+</div>
+
+
 
     <div class="footer-area">
         <div class="qr-section">
@@ -297,8 +359,11 @@
             <div style="width: 150px; border-top: 1.2px solid #333; padding-top: 8px; font-weight: bold; margin-top:30px;">Signature</div>
         </div>
     </div>
+<!-- Disclaimer -->
+<div class="no-challenge-disclaimer" style="text-align: left; font-size: 7px; color: #7f8c8d; margin-top: 4px; font-style: italic; max-width: 160px; line-height: 1.2;">
+              This E-Bill: Not legally binding. <br>Cannot be challenged in any court.
+            </div>
 </div>
-
 <div class="action-buttons no-print">
     <button class="btn btn-pdf" onclick="downloadFile('pdf')">Save PDF</button>
     <button class="btn btn-jpg" onclick="downloadFile('jpg')">Save JPG</button>
@@ -533,27 +598,76 @@ function updateTitleSize(sizeValue){
     }
 
     function calc() {
-        let subTotal = 0, discountTotal = 0;
-        document.querySelectorAll("#items tr").forEach(row => {
-            const qty = parseFloat(row.querySelector(".q").value) || 0;
-            const rate = parseFloat(row.querySelector(".r").value) || 0;
-            const disc = parseFloat(row.querySelector(".d").value) || 0;
-            const total = (qty * rate) - disc;
-            
-            row.querySelector(".rt").innerText = total.toFixed(2); 
-            subTotal += (qty * rate); 
-            discountTotal += disc;
-        });
+    let subTotal = 0, discountTotal = 0;
+    
+    // 🟢 DISCOUNT MASTER CHECKBOX DETECTION
+    const discMaster = document.getElementById('disc-master');
+    const isDiscountActive = discMaster ? discMaster.checked : false;
+
+    // 1. Har item ki calculation
+    document.querySelectorAll("#items tr").forEach(row => {
+        const qty = parseFloat(row.querySelector(".q").value) || 0;
+        const rate = parseFloat(row.querySelector(".r").value) || 0;
         
-        document.getElementById("sub-val").innerText = subTotal.toFixed(2);
-        document.getElementById("disc-amt").innerText = discountTotal.toFixed(2);
+        // Agar discount unchecked hai, to item-level disc zero (0) tasawwur ho
+        const disc = isDiscountActive ? (parseFloat(row.querySelector(".d").value) || 0) : 0;
         
-        const grandTotal = subTotal - discountTotal; 
-        document.getElementById("total-val").innerText = grandTotal.toFixed(2);
+        const total = (qty * rate) - disc;
         
-        const paidAmount = parseFloat(document.getElementById("paid").value) || 0;
-        document.getElementById("bal-val").innerText = (grandTotal - paidAmount).toFixed(2);
+        row.querySelector(".rt").innerText = total.toFixed(2); 
+        subTotal += (qty * rate); 
+        discountTotal += disc;
+    });
+    
+    // Values ko UI par show karna
+    document.getElementById("sub-val").innerText = subTotal.toFixed(2);
+    
+    // Discount display reset if unchecked
+    const discAmtField = document.getElementById("disc-amt");
+    if (discAmtField) {
+        discAmtField.innerText = discountTotal.toFixed(2);
     }
+
+    // 2. TAX LOGIC WITH LIVE UNCHECK / CHANGE SENSOR
+    let taxAmount = 0;
+    const taxMaster = document.getElementById('tax-master');
+    const taxRateField = document.getElementById('tax-rate-field');
+    const taxAmountField = document.getElementById('tax-amount');
+
+    if (taxMaster && taxMaster.checked && taxRateField) {
+        const taxPercent = parseFloat(taxRateField.innerText) || parseFloat(taxRateField.value) || 0;
+        const taxableAmount = subTotal - discountTotal;
+        taxAmount = (taxableAmount * taxPercent) / 100;
+    }
+
+    if (taxAmountField) {
+        taxAmountField.innerText = taxAmount.toFixed(2);
+    }
+
+    // 3. GRAND TOTAL CALCULATION (SubTotal - Discount + Tax)
+    const grandTotal = (subTotal - discountTotal) + taxAmount;
+    document.getElementById("total-val").innerText = grandTotal.toFixed(2);
+
+    // 🆕 4. FETCH PREVIOUS BALANCE FROM INPUT VALUE (Live Layer Fix)
+    const prevBalField = document.getElementById("prev-bal-val");
+    const previousBalance = prevBalField ? (parseFloat(prevBalField.value) || 0) : 0;
+
+    // 5. TOTAL PENDING BALANCE CALCULATION (Grand Total + Previous Balance - Paid)
+    const paidInput = document.getElementById("paid");
+    const paid = parseFloat(paidInput ? paidInput.value : 0) || 0;
+    const balance = (grandTotal + previousBalance) - paid;
+    
+    const balValField = document.getElementById("bal-val");
+    if (balValField) {
+        balValField.innerText = balance.toFixed(2);
+    }
+}
+
+
+
+
+
+
 
     function captureCustomerName() {
         const custSpan = document.getElementById("cust-name-field");
@@ -808,53 +922,145 @@ function updateTitleSize(sizeValue){
     addRow();
 
     document.addEventListener("DOMContentLoaded", function() {
-        renderBillsHistory();
+    // 🟢 1. Bills History & Bill Number Load
+    renderBillsHistory();
 
-        const lastBill = localStorage.getItem("last_bill_no");
-        if (lastBill) {
-            document.getElementById("bill-no").innerText = lastBill;
-        }
+    const lastBill = localStorage.getItem("last_bill_no");
+    if (lastBill) {
+        document.getElementById("bill-no").innerText = lastBill;
+    }
 
-        const custSpan = document.getElementById("cust-name-field");
-        const addrDiv = document.getElementById("cust-address-field");
-        if (custSpan && addrDiv) {
-            const wrap = custSpan.parentElement; wrap.style.position = "relative";
-            
-            const cSuggestBox = document.createElement("div");
-            cSuggestBox.className = "suggestion-container";
-            cSuggestBox.style.position = "absolute"; cSuggestBox.style.top = "100%"; cSuggestBox.style.left = "0"; cSuggestBox.style.width = "200px"; cSuggestBox.style.zIndex = "99999";
-            wrap.appendChild(cSuggestBox);
-
-            custSpan.addEventListener("input", function() {
-                const val = this.innerText.trim().toLowerCase();
-                cSuggestBox.innerHTML = '';
-                if (val.length > 0) {
-                    const matches = savedCustomers.filter(c => c.name.toLowerCase().includes(val));
-                    if (matches.length > 0) {
-                        cSuggestBox.style.display = 'block';
-                        matches.forEach(m => {
-                            const div = document.createElement('div');
-                            div.className = 'suggestion-item'; div.innerText = m.name; div.style.cursor = "pointer";
-                            div.onclick = function() {
-                                custSpan.innerText = m.name; addrDiv.innerText = m.address || "#"; cSuggestBox.style.display = 'none';
-                                const range = document.createRange(); const sel = window.getSelection();
-                                range.selectNodeContents(custSpan); range.collapse(false);
-                                sel.removeAllRanges(); sel.addRange(range);
-                            };
-                            cSuggestBox.appendChild(div);
-                        });
-                    } else { cSuggestBox.style.display = 'none'; }
-                } else { cSuggestBox.style.display = 'none'; }
-            });
-
-            custSpan.addEventListener('blur', function() { setTimeout(() => { cSuggestBox.style.display = 'none'; }, 200); });
-        }
+    // 🟢 2. Customer Suggestions Box Logic
+    const custSpan = document.getElementById("cust-name-field");
+    const addrDiv = document.getElementById("cust-address-field");
+    if (custSpan && addrDiv) {
+        const wrap = custSpan.parentElement; 
+        wrap.style.position = "relative";
         
-        document.getElementById('pageSize').addEventListener('change', function() {
+        const cSuggestBox = document.createElement("div");
+        cSuggestBox.className = "suggestion-container";
+        cSuggestBox.style.position = "absolute"; 
+        cSuggestBox.style.top = "100%"; 
+        cSuggestBox.style.left = "0"; 
+        cSuggestBox.style.width = "200px"; 
+        cSuggestBox.style.zIndex = "99999";
+        wrap.appendChild(cSuggestBox);
+
+        custSpan.addEventListener("input", function() {
+            const val = this.innerText.trim().toLowerCase();
+            cSuggestBox.innerHTML = '';
+            if (val.length > 0) {
+                const matches = savedCustomers.filter(c => c.name.toLowerCase().includes(val));
+                if (matches.length > 0) {
+                    cSuggestBox.style.display = 'block';
+                    matches.forEach(m => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item'; 
+                        div.innerText = m.name; 
+                        div.style.cursor = "pointer";
+                        div.onclick = function() {
+    custSpan.innerText = m.name; 
+    addrDiv.innerText = m.address || "#"; 
+    cSuggestBox.style.display = 'none';
+
+    // 🆕 PREVIOUS BALANCE FETCH LOGIC FROM SAVED BILLS LOG
+    let foundPrevBal = 0;
+    // History log me se is customer ka sabse pehla (jo ke latest hota hai) bill dhoondo
+    const lastCustomerBill = savedBillsLog.find(b => b.customer.toLowerCase().trim() === m.name.toLowerCase().trim());
+    
+    if (lastCustomerBill && lastCustomerBill.balanceAmount) {
+        // Currency symbol aur baqi characters ko saaf kar k sirf number nikalna
+        const cleanBal = lastCustomerBill.balanceAmount.replace(/[^0-9.-]/g, '');
+        foundPrevBal = parseFloat(cleanBal) || 0;
+    }
+
+    // UI par previous balance set karna (As an Input Value kyun ke ab ye box editable hai)
+    const prevBalField = document.getElementById("prev-bal-val");
+    if (prevBalField) {
+        prevBalField.value = foundPrevBal.toFixed(2); // .innerText ki jagah .value lagaya hai
+    }
+
+    // Calculation ko refresh karna taake naya total ban jaye
+    calc();
+
+    const range = document.createRange(); 
+    const sel = window.getSelection();
+    range.selectNodeContents(custSpan); 
+    range.collapse(false);
+    sel.removeAllRanges(); 
+    sel.addRange(range);
+};
+cSuggestBox.appendChild(div);
+
+                    });
+                } else { cSuggestBox.style.display = 'none'; }
+            } else { cSuggestBox.style.display = 'none'; }
+        });
+
+        custSpan.addEventListener('blur', function() { 
+            setTimeout(() => { cSuggestBox.style.display = 'none'; }, 200); 
+        });
+    }
+    
+    // Page Size Logic
+    const pageSizeElement = document.getElementById('pageSize');
+    if (pageSizeElement) {
+        pageSizeElement.addEventListener('change', function() {
             document.getElementById('topPageSize').value = this.value;
             document.getElementById('topCustomDims').style.display = this.value === 'custom' ? 'inline-block' : 'none';
         });
-    });
+    }
+
+    // 🟢 3. Invoice Notes Auto-Save Logic
+    const noteBody = document.getElementById("note-body");
+    if (noteBody) {
+        const savedNote = localStorage.getItem("custom_invoice_note");
+        if (savedNote !== null) {
+            noteBody.innerText = savedNote;
+        }
+
+        noteBody.addEventListener("input", function () {
+            localStorage.setItem("custom_invoice_note", this.innerText);
+        });
+
+        noteBody.addEventListener("focus", function () {
+            if (this.innerText.trim() === "Thank you for your business!") {
+                document.execCommand('selectAll', false, null);
+            }
+        });
+    }
+
+    // 🟢 4. TAX & DISCOUNT LIVE CALCULATION LISTENERS (DOM ke andar)
+    
+    // A) Discount Master Checkbox Live Click
+    const discMaster = document.getElementById('disc-master');
+    if (discMaster) {
+        discMaster.addEventListener('change', function() {
+            calc();
+        });
+    }
+
+    // B) Tax Master Checkbox (LIVE UNCHECK RESET KE LIYE SABSE ZAROORI)
+    const taxMaster = document.getElementById('tax-master');
+    if (taxMaster) {
+        taxMaster.addEventListener('change', function() {
+            calc();
+        });
+    }
+
+    // C) Tax Rate Field (Value input ya change karne par)
+    const taxRateField = document.getElementById('tax-rate-field');
+    if (taxRateField) {
+        // Agar dynamic span/div hai ya input field hai, donon conditions cover ho jayengi
+        taxRateField.addEventListener('input', calc);
+        taxRateField.addEventListener('change', calc);
+        taxRateField.addEventListener('keyup', calc);
+        taxRateField.addEventListener('blur', calc);
+    }
+});
+
+
+
 
     (function(){
         const devInfo = { name: "WasiDevelopers", whatsapp: "923346800959", displayPhone: "0334-6800959" };
@@ -872,6 +1078,7 @@ function updateTitleSize(sizeValue){
         };
         updateUI(); setInterval(updateUI, 1500);
     })();
+    
 </script>
 
         <!-- Modern PWA Install Banner - FIXED ID & CLOSE BUTTON -->
@@ -905,7 +1112,7 @@ document.onkeydown = function(e) {
 // 2. ⚠️ STRICT CODE INTEGRITY VERIFICATION (3 SECONDS LOCK)
 (function() {
     // 🌟 AAPKA NEW VERIFIED CODE SIZE: Yahan 4341 set kar diya hai!
-    const CORRECT_HASH_SIGNATURE = 4341; 
+    const CORRECT_HASH_SIGNATURE = 5628; 
 
     const enforceSecurityLock = () => {
         try {
@@ -927,7 +1134,7 @@ document.onkeydown = function(e) {
 
             // 👇 ALERT KO COMMENT KAR DIYA HAI: Taake baar baar popup na aaye. 
             // Agar kabhi dobara check karna ho to shuru se '//' hata dena.
-            // alert("🔥 AAPKA ORIGINAL CODE SIZE: " + currentLength);
+            //        alert("🔥 AAPKA ORIGINAL CODE SIZE: " + currentLength);
 
             // Agar kisi ne code mein tabdeeli ki to character length badal jayegi
             if (currentLength !== CORRECT_HASH_SIGNATURE) {
@@ -955,12 +1162,9 @@ document.onkeydown = function(e) {
     };
     
     // 🔥 SECURITY ACTIVE! 3 second baad system background mein check karega.
-    setTimeout(enforceSecurityLock, 3000); 
+             setTimeout(enforceSecurityLock, 3000); 
 })();
+
 </script>
-
-
-    
-
 </body>
 </html>
