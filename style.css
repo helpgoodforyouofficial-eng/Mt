@@ -397,7 +397,19 @@ input:focus { background: #fffde7; }
 
 /* NTN Specific Control */
 .bill-wrapper[dir="rtl"] .ntn-wrap .editable-text-container {
-    padding-left: 22px !important;
+    padding-right: 0px !important;
+}
+
+/* 🎯 NTN Label Direct Shift Fix */
+.bill-wrapper[dir="rtl"] .ntn-wrap .meta-label {
+    position: relative !important;
+    left: -50px !important; /* 👈 Negative value e.g. -10px (Left), Positive value e.g. 10px (Right) */
+}
+
+/* 🎯 NTN Value / Numbers Direct Shift Fix */
+.bill-wrapper[dir="rtl"] .ntn-wrap #ntn-field {
+    position: relative !important;
+    left: -10px !important; /* 👈 Negative value e.g. -10px (Left), Positive value e.g. 10px (Right) */
 }
 
 /* Bill No Specific Control */
