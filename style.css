@@ -337,6 +337,60 @@ input:focus { background: #fffde7; }
     direction: rtl !important;
 }
 
+
+/* ============================================================
+   👑 ULTIMATE RTL PRINT & SAVE IMAGE FIX: Items Description Alignment
+   ============================================================ */
+
+/* 1. Normal Screen Table Cells & Inputs Strict Right Alignment */
+.bill-wrapper[dir="rtl"] table td,
+.bill-wrapper[dir="rtl"] table th,
+.bill-wrapper[dir="rtl"] table input,
+.bill-wrapper[dir="rtl"] table [contenteditable="true"],
+.bill-wrapper[dir="rtl"] .item-desc,
+.bill-wrapper[dir="rtl"] .item-name {
+    direction: rtl !important;
+    text-align: right !important;
+    unicode-bidi: isolate !important;
+}
+
+/* 2. PRINT / HTML2CANVAS (Save Image & WhatsApp Download Fix) */
+@media print {
+    /* Main Table Container Direction Force */
+    .bill-wrapper[dir="rtl"] table,
+    .bill-wrapper[dir="rtl"] tbody,
+    .bill-wrapper[dir="rtl"] tr {
+        direction: rtl !important;
+    }
+
+    /* All Table Cells Force Right Align */
+    .bill-wrapper[dir="rtl"] table td,
+    .bill-wrapper[dir="rtl"] table th,
+    .bill-wrapper[dir="rtl"] table td *,
+    .bill-wrapper[dir="rtl"] table th * {
+        direction: rtl !important;
+        text-align: right !important;
+        float: none !important;
+    }
+
+    /* Items Details Column (Tafseel Saman) Specific Strict Pinning */
+    .bill-wrapper[dir="rtl"] table td:nth-child(2),
+    .bill-wrapper[dir="rtl"] table td:nth-child(4) { /* Agar tafseel 2nd ya 4th column ho */
+        text-align: right !important;
+        direction: rtl !important;
+        padding-right: 8px !important;
+    }
+}
+
+/* 3. HTML2CANVAS Temporary Render Engine Fix (Direct Override) */
+div[class*="html2canvas"] .bill-wrapper[dir="rtl"] td,
+div[class*="html2canvas"] .bill-wrapper[dir="rtl"] input,
+div[class*="html2canvas"] .bill-wrapper[dir="rtl"] [contenteditable] {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+
 /* ============================================================
    👑 MASTER RTL FIX: Date, Time, NTN & Bill No Alignment
    Har ek element ka alag control mojud hai
