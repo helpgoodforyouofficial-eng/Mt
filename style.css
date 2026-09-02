@@ -406,7 +406,7 @@ div[class*="html2canvas"] .bill-wrapper[dir="rtl"] [contenteditable] {
     flex-direction: row !important;      /* Label Right, Value Left */
     justify-content: flex-end !important;
     align-items: center !important;
-    gap: 8px !important;                 /* 👈 Label aur Value ke beech ka gap */
+    gap: 2px !important;                 /* 👈 Label aur Value ke beech ka gap */
     margin: 4px 0 !important;            /* 👈 Rows ke beech ka vertical gap */
 }
 
