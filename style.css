@@ -268,11 +268,30 @@ input:focus { background: #fffde7; }
     left: 0px;                         /* 👈 Urdu: PENCIL position */
 }
 /* ============================================
-   🩹 PRINT FIX: Customer Info (Name, Phone, Address)
-   Customer Name ke reference par mukammal alignment
+   🇵🇰 RTL & PRINT FIX: Items Details Alignment
+   Save Image / WhatsApp & Print Alignment Lock
    ============================================ */
+
+/* 1. Normal Screen RTL Table Alignment */
+.bill-wrapper[dir="rtl"] table,
+.bill-wrapper[dir="rtl"] th,
+.bill-wrapper[dir="rtl"] td {
+    direction: rtl !important;
+}
+
+/* Items Description Column Specific Alignment */
+.bill-wrapper[dir="rtl"] td.item-desc,
+.bill-wrapper[dir="rtl"] td.description,
+.bill-wrapper[dir="rtl"] td:nth-child(2), /* Agar 2nd column description hai */
+.bill-wrapper[dir="rtl"] .item-name-input,
+.bill-wrapper[dir="rtl"] [contenteditable="true"] {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* 2. PRINT / HTML2CANVAS (Save Image & WhatsApp) FORCED RTL LOCK */
 @media print {
-    /* English (LTR): Customer Info ki sabhi lines (Name, Address, Phone) Name jaisi bilkul left pin hongi */
+    /* Print alignment for Customer Info */
     .bill-wrapper:not([dir="rtl"]) .customer-info-wrap,
     .bill-wrapper:not([dir="rtl"]) .customer-info-wrap * {
         text-align: left !important;
@@ -280,7 +299,6 @@ input:focus { background: #fffde7; }
         float: none !important;
     }
 
-    /* Pencil containers aur Editable fields ko Name wale style par lock kiya hai */
     .bill-wrapper:not([dir="rtl"]) .customer-info-wrap .editable-text-container,
     .bill-wrapper:not([dir="rtl"]) .customer-info-wrap [contenteditable="true"] {
         display: inline-block !important;
@@ -289,13 +307,36 @@ input:focus { background: #fffde7; }
         text-align: left !important;
     }
 
-    /* 🇵🇰 URDU (RTL): Urdu mein sab right pin hongi */
     .bill-wrapper[dir="rtl"] .customer-info-wrap,
     .bill-wrapper[dir="rtl"] .customer-info-wrap * {
         text-align: right !important;
         justify-content: flex-end !important;
     }
+
+    /* 🎯 Items Details Table Print & Image Lock */
+    .bill-wrapper[dir="rtl"] table th,
+    .bill-wrapper[dir="rtl"] table td,
+    .bill-wrapper[dir="rtl"] table td * {
+        direction: rtl !important;
+    }
+
+    /* Description / Tafseel column Right Alignment Force */
+    .bill-wrapper[dir="rtl"] table td:nth-child(2),
+    .bill-wrapper[dir="rtl"] .item-desc,
+    .bill-wrapper[dir="rtl"] .item-name {
+        text-align: right !important;
+        justify-content: flex-start !important; /* RTL flex adjustment */
+    }
 }
+
+/* 3. HTML2CANVAS Canvas Image Capture Class Override (WhatsApp / JPG Fix) */
+.rendering-canvas .bill-wrapper[dir="rtl"] td,
+.rendering-canvas .bill-wrapper[dir="rtl"] .item-desc,
+.rendering-canvas .bill-wrapper[dir="rtl"] [contenteditable="true"] {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
 /* ============================================================
    👑 MASTER RTL FIX: Date, Time, NTN & Bill No Alignment
    Har ek element ka alag control mojud hai
