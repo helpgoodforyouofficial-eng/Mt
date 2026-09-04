@@ -111,6 +111,129 @@ input:focus { background: #fffde7; }
     padding-right: 5px;
 }
 
+/* 🆕 v75.2: OWNER LINE — PRINT/JPG/PDF FIX */
+.bill-wrapper[dir="rtl"] .header > div:first-child,
+.bill-wrapper[dir="rtl"] .header > div:first-child * {
+    text-align: right !important;
+}
+/* Owner label/name right edge se chipke — pencil left side par shift (RTL me) */
+.bill-wrapper[dir="rtl"] .owner-wrap .editable-text-container {
+    padding-right: 0 !important;
+    padding-left: 18px;
+}
+.bill-wrapper[dir="rtl"] .owner-wrap .editable-text-container::after {
+    right: auto !important;
+    left: 0 !important;
+}
+
+@media (max-width: 600px) {
+    .header { flex-direction: column; text-align: left; gap: 15px; }
+    .header div { text-align: left !important; }
+    .header > div:last-child, .header > div:last-child * { text-align: right !important; justify-content: flex-end !important; align-items: flex-end !important; }
+    .header > div:last-child .bill-no-row { align-items: center !important; gap: 4px !important; }
+    .header > div:last-child .bill-no-row * { align-items: center !important; }
+    .customer-info-wrap, .customer-info-wrap * { text-align: left !important; justify-content: flex-start !important; }
+    [dir="rtl"] .customer-info-wrap, [dir="rtl"] .customer-info-wrap * { text-align: right !important; justify-content: flex-start !important; }
+    .action-buttons { grid-template-columns: 1fr; }
+    .bill-wrapper { padding: 15px; }
+    input { font-size: 13px; }
+}
+
+/* --- Print Control Layout --- */
+@media print {
+    .no-print, .admin-panel, .btn-add, .action-buttons, .modal, .rt-col-action, .record-panel { display: none !important; }
+    body { background: #fff; padding: 0; margin: 0; }
+    .bill-wrapper { border: none !important; box-shadow: none !important; padding: 0px; margin: 0 auto; overflow: visible !important; }
+    .bill-wrapper .header { flex-direction: row !important; text-align: left !important; gap: 0 !important; }
+    .bill-wrapper .header div { text-align: left !important; }
+    .bill-wrapper .header div:last-child { text-align: right !important; }
+    table, th, td { border: 1px solid #000 !important; }
+    .editable-text-container::after, .editable-input-container::after { display: none !important; }
+    .editable-text-container { padding-right: 0 !important; }
+    @page { margin: 0.5cm; }
+}
+
+/* ============================================
+   🆕 v76 (Fixed): META COLUMN — Date/Time/NTN/Bill No
+   ek aligned column mein (English + Urdu same layout)
+   ============================================ */
+
+/* Main row setup - Flex with precise alignment */
+.meta-row { 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end; 
+    gap: 9px; 
+    margin: 2px 0; 
+}
+
+.meta-label {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Value Box - Fixed width removed to prevent forced gaps & overlapping */
+.meta-value { 
+    min-width: 110px; 
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Text alignment consistently to right for clean grid look */
+.meta-row .meta-value,
+.meta-row .meta-value *,
+.force-pc-layout .meta-row .meta-value,
+.force-pc-layout .meta-row .meta-value * { 
+    text-align: right !important; 
+}
+
+/* Fix for Editable Text Container Pencil Icons */
+.meta-row .editable-text-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+/* RTL (Urdu): Keep layout structure intact without breaking text alignment */
+.bill-wrapper[dir="rtl"] .meta-row {
+    justify-content: flex-end;
+}
+
+.bill-wrapper[dir="rtl"] .meta-row .meta-value,
+.bill-wrapper[dir="rtl"] .meta-row .meta-value * { 
+    text-align: right !important; 
+}
+
+.bill-wrapper[dir="rtl"] .meta-row .editable-text-container {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+/* Mobile par bhi column alignment */
+@media (max-width: 600px) {
+    .header > div:last-child .meta-row { 
+        align-items: center !important; 
+        justify-content: flex-end !important; 
+    }
+}
+
+/* Print/JPG/PDF Alignment */
+@media print {
+    .bill-wrapper .meta-row .meta-value,
+    .bill-wrapper .meta-row .meta-value *,
+    .bill-wrapper[dir="rtl"] .meta-row .meta-value,
+    .bill-wrapper[dir="rtl"] .meta-row .meta-value * { 
+        text-align: right !important; 
+    }
+    .bill-wrapper[dir="rtl"] .meta-row .editable-text-container { 
+        padding-left: 0 !important; 
+        padding-right: 0 !important;
+    }
+}
+
 /* 🆕 ENGLISH: Bill No label thora right shift */
 .bill-no-row .meta-label {
     position: relative;
@@ -144,131 +267,122 @@ input:focus { background: #fffde7; }
     right: auto !important;
     left: 0px;                         /* 👈 Urdu: PENCIL position */
 }
+/* ============================================
+   🇵🇰 RTL & PRINT FIX: Items Details Alignment
+   Save Image / WhatsApp & Print Alignment Lock
+   ============================================ */
 
+/* 1. Normal Screen RTL Table Alignment */
+.bill-wrapper[dir="rtl"] table,
+.bill-wrapper[dir="rtl"] th,
+.bill-wrapper[dir="rtl"] td {
+    direction: rtl !important;
+}
 
+/* Items Description Column Specific Alignment */
+.bill-wrapper[dir="rtl"] td.item-desc,
+.bill-wrapper[dir="rtl"] td.description,
+.bill-wrapper[dir="rtl"] td:nth-child(2), /* Agar 2nd column description hai */
+.bill-wrapper[dir="rtl"] .item-name-input,
+.bill-wrapper[dir="rtl"] [contenteditable="true"] {
+    text-align: right !important;
+    direction: rtl !important;
+}
 
+/* 2. PRINT / HTML2CANVAS (Save Image & WhatsApp) FORCED RTL LOCK */
+@media print {
+    /* Print alignment for Customer Info */
+    .bill-wrapper:not([dir="rtl"]) .customer-info-wrap,
+    .bill-wrapper:not([dir="rtl"]) .customer-info-wrap * {
+        text-align: left !important;
+        justify-content: flex-start !important;
+        float: none !important;
+    }
+
+    .bill-wrapper:not([dir="rtl"]) .customer-info-wrap .editable-text-container,
+    .bill-wrapper:not([dir="rtl"]) .customer-info-wrap [contenteditable="true"] {
+        display: inline-block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+
+    .bill-wrapper[dir="rtl"] .customer-info-wrap,
+    .bill-wrapper[dir="rtl"] .customer-info-wrap * {
+        text-align: right !important;
+        justify-content: flex-end !important;
+    }
+
+    /* 🎯 Items Details Table Print & Image Lock */
+    .bill-wrapper[dir="rtl"] table th,
+    .bill-wrapper[dir="rtl"] table td,
+    .bill-wrapper[dir="rtl"] table td * {
+        direction: rtl !important;
+    }
+
+    /* Description / Tafseel column Right Alignment Force */
+    .bill-wrapper[dir="rtl"] table td:nth-child(2),
+    .bill-wrapper[dir="rtl"] .item-desc,
+    .bill-wrapper[dir="rtl"] .item-name {
+        text-align: right !important;
+        justify-content: flex-start !important; /* RTL flex adjustment */
+    }
+}
+
+/* 3. HTML2CANVAS Canvas Image Capture Class Override (WhatsApp / JPG Fix) */
+.rendering-canvas .bill-wrapper[dir="rtl"] td,
+.rendering-canvas .bill-wrapper[dir="rtl"] .item-desc,
+.rendering-canvas .bill-wrapper[dir="rtl"] [contenteditable="true"] {
+    text-align: right !important;
+    direction: rtl !important;
+}
 
 
 /* ============================================================
-   👑 MASTER CSS FIX: Owner, Table Details, Mobile & Print Layout
+   👑 ULTIMATE RTL PRINT & SAVE IMAGE FIX: Items Description Alignment
    ============================================================ */
 
-/* 1. OWNER LINE — PRINT/JPG/PDF FIX */
-.bill-wrapper[dir="rtl"] .header > div:first-child,
-.bill-wrapper[dir="rtl"] .header > div:first-child * {
-    text-align: right !important;
-}
-
-/* Owner label/name right edge se chipke — pencil left side par shift (RTL me) */
-.bill-wrapper[dir="rtl"] .owner-wrap .editable-text-container {
-    padding-right: 0 !important;
-    padding-left: 18px !important;
-}
-
-.bill-wrapper[dir="rtl"] .owner-wrap .editable-text-container::after {
-    right: auto !important;
-    left: 0 !important;
-}
-
-/* 2. RTL TABLE & ITEMS DETAILS STRICT ALIGNMENT (Screen & JPG Fix) */
-.bill-wrapper[dir="rtl"] table,
-.bill-wrapper[dir="rtl"] th,
-.bill-wrapper[dir="rtl"] td,
+/* 1. Normal Screen Table Cells & Inputs Strict Right Alignment */
+.bill-wrapper[dir="rtl"] table td,
+.bill-wrapper[dir="rtl"] table th,
 .bill-wrapper[dir="rtl"] table input,
 .bill-wrapper[dir="rtl"] table [contenteditable="true"],
-.bill-wrapper[dir="rtl"] td.item-desc,
-.bill-wrapper[dir="rtl"] td.description,
-.bill-wrapper[dir="rtl"] td:nth-child(2),
-.bill-wrapper[dir="rtl"] .item-name-input,
+.bill-wrapper[dir="rtl"] .item-desc,
 .bill-wrapper[dir="rtl"] .item-name {
     direction: rtl !important;
     text-align: right !important;
     unicode-bidi: isolate !important;
 }
 
-/* 3. INDIVIDUAL SHIFT CONTROLS (NTN & Bill No Adjustment) */
-.bill-wrapper[dir="rtl"] .ntn-wrap .meta-label {
-    position: relative !important;
-    left: 0px !important; /* 👈 Negative = Left | Positive = Right */
-}
-
-.bill-wrapper[dir="rtl"] .ntn-wrap #ntn-field {
-    position: relative !important;
-    left: 0px !important; /* 👈 Negative = Left | Positive = Right */
-}
-
-.bill-wrapper[dir="rtl"] .bill-no-row .meta-label {
-    position: relative !important;
-    left: -30px !important; /* 👈 Urdu Bill No Label Shift */
-}
-
-/* 4. MOBILE RESPONSIVE CONTROL (Combined) */
-@media (max-width: 600px) {
-    .header { flex-direction: column; text-align: left; gap: 15px; }
-    .header div { text-align: left !important; }
-    .header > div:last-child, 
-    .header > div:last-child * { 
-        text-align: right !important; 
-        justify-content: flex-end !important; 
-        align-items: flex-end !important; 
-    }
-    .header > div:last-child .bill-no-row { align-items: center !important; gap: 4px !important; }
-    .header > div:last-child .bill-no-row * { align-items: center !important; }
-    .header > div:last-child .meta-row { align-items: center !important; justify-content: flex-end !important; }
-    .customer-info-wrap, .customer-info-wrap * { text-align: left !important; justify-content: flex-start !important; }
-    [dir="rtl"] .customer-info-wrap, [dir="rtl"] .customer-info-wrap * { text-align: right !important; justify-content: flex-start !important; }
-    .action-buttons { grid-template-columns: 1fr; }
-    .bill-wrapper { padding: 15px; }
-    input { font-size: 13px; }
-}
-
-/* 5. PRINT / JPG / PDF & HTML2CANVAS ENGINE LOCK (Combined) */
+/* 2. PRINT / HTML2CANVAS (Save Image & WhatsApp Download Fix) */
 @media print {
-    .no-print, .admin-panel, .btn-add, .action-buttons, .modal, .rt-col-action, .record-panel { display: none !important; }
-    body { background: #fff; padding: 0; margin: 0; }
-    .bill-wrapper { border: none !important; box-shadow: none !important; padding: 0px; margin: 0 auto; overflow: visible !important; }
-    .bill-wrapper .header { flex-direction: row !important; text-align: left !important; gap: 0 !important; }
-    .bill-wrapper .header div { text-align: left !important; }
-    .bill-wrapper .header div:last-child { text-align: right !important; }
-    table, th, td { border: 1px solid #000 !important; }
-    .editable-text-container::after, .editable-input-container::after { display: none !important; }
-    .editable-text-container { padding-right: 0 !important; }
-    @page { margin: 0.5cm; }
+    /* Main Table Container Direction Force */
+    .bill-wrapper[dir="rtl"] table,
+    .bill-wrapper[dir="rtl"] tbody,
+    .bill-wrapper[dir="rtl"] tr {
+        direction: rtl !important;
+    }
 
-    /* Customer Info Print Pinning */
-    .bill-wrapper:not([dir="rtl"]) .customer-info-wrap,
-    .bill-wrapper:not([dir="rtl"]) .customer-info-wrap * { text-align: left !important; justify-content: flex-start !important; float: none !important; }
-    .bill-wrapper[dir="rtl"] .customer-info-wrap,
-    .bill-wrapper[dir="rtl"] .customer-info-wrap * { text-align: right !important; justify-content: flex-end !important; }
-
-    /* Meta Alignment Print Pinning */
-    .bill-wrapper .meta-row .meta-value, .bill-wrapper .meta-row .meta-value *,
-    .bill-wrapper[dir="rtl"] .meta-row .meta-value, .bill-wrapper[dir="rtl"] .meta-row .meta-value * { text-align: right !important; }
-    .bill-wrapper[dir="rtl"] .meta-row .editable-text-container { padding-left: 0 !important; padding-right: 0 !important; }
-
-    /* RTL Table Print Pinning */
-    .bill-wrapper[dir="rtl"] table, .bill-wrapper[dir="rtl"] tbody, .bill-wrapper[dir="rtl"] tr { direction: rtl !important; }
-    .bill-wrapper[dir="rtl"] table td, 
-    .bill-wrapper[dir="rtl"] table th, 
-    .bill-wrapper[dir="rtl"] table td *, 
+    /* All Table Cells Force Right Align */
+    .bill-wrapper[dir="rtl"] table td,
+    .bill-wrapper[dir="rtl"] table th,
+    .bill-wrapper[dir="rtl"] table td *,
     .bill-wrapper[dir="rtl"] table th * {
         direction: rtl !important;
         text-align: right !important;
         float: none !important;
     }
 
+    /* Items Details Column (Tafseel Saman) Specific Strict Pinning */
     .bill-wrapper[dir="rtl"] table td:nth-child(2),
-    .bill-wrapper[dir="rtl"] .item-desc,
-    .bill-wrapper[dir="rtl"] .item-name {
+    .bill-wrapper[dir="rtl"] table td:nth-child(4) { /* Agar tafseel 2nd ya 4th column ho */
         text-align: right !important;
-        justify-content: flex-start !important;
+        direction: rtl !important;
+        padding-right: 8px !important;
     }
 }
 
-/* 6. HTML2CANVAS CANVAS CAPTURE OVERRIDE (WhatsApp Share & JPG Export) */
-.rendering-canvas .bill-wrapper[dir="rtl"] td,
-.rendering-canvas .bill-wrapper[dir="rtl"] .item-desc,
-.rendering-canvas .bill-wrapper[dir="rtl"] [contenteditable="true"],
+/* 3. HTML2CANVAS Temporary Render Engine Fix (Direct Override) */
 div[class*="html2canvas"] .bill-wrapper[dir="rtl"] td,
 div[class*="html2canvas"] .bill-wrapper[dir="rtl"] input,
 div[class*="html2canvas"] .bill-wrapper[dir="rtl"] [contenteditable] {
